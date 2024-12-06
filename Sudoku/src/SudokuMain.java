@@ -10,7 +10,6 @@
         // private variables
         GameBoardPanel board = new GameBoardPanel();
         JButton btnNewGame = new JButton("New Game");
-        private boolean isFirstTime = true;
 
         // Constructor
         public SudokuMain() {
@@ -22,10 +21,11 @@
             JPopupMenu popupMenu = new JPopupMenu();
             JMenuItem restartMenuItem = new JMenuItem("Restart Game");
 
-            if (isFirstTime) {
-                showWelcomeMessage();
-                isFirstTime = false;
-            }
+            JOptionPane.showMessageDialog(this,
+                    "Welcome to Sudoku! \n" +
+                            "How to play this game: \nFill in a 9x9 grid so that each column, \neach row, and each of the nine 3x3 subgrids contains all of the digits from 1 to 9.",
+                    "Welcome to Sudoku",
+                    JOptionPane.INFORMATION_MESSAGE);
 
             restartMenuItem.addActionListener(new ActionListener() {
                 @Override
@@ -66,13 +66,6 @@
             setVisible(true);
         }
 
-        private void showWelcomeMessage() {
-            JOptionPane.showMessageDialog(this,
-                    "Welcome to Sudoku! \n" +
-                            "How to play this game: \nFill in a 9x9 grid so that each column, \neach row, and each of the nine 3x3 subgrids contains all of the digits from 1 to 9.",
-                    "Welcome to Sudoku",
-                    JOptionPane.INFORMATION_MESSAGE);
-        }
 
         /** The entry main() entry method */
         public static void main(String[] args) {

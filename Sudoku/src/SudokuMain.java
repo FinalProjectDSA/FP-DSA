@@ -8,11 +8,11 @@ public class SudokuMain extends JFrame {
     // private variables
     GameBoardPanel board = new GameBoardPanel();
     JButton restartGame = new JButton("Restart Game");
-    private JLabel statusBar = new JLabel("Welcome to Sudoku!");
     private JLabel scoreLabel = new JLabel("Score: "); // Score label
-    private JLabel playerNameLabel = new JLabel("Player name: ");
-
     private String playerName = ""; // Player's name
+
+    private JLabel playerNameLabel = new JLabel("Player name: " + playerName);
+
     private int score = 0; // Player's score
 
     // Constructor
@@ -91,7 +91,6 @@ public class SudokuMain extends JFrame {
     }
 
 
-    // Show home page dialog
     private void showHomePage() {
         JDialog homeDialog = new JDialog(this, "Welcome to Sudoku", true);
 
@@ -129,10 +128,10 @@ public class SudokuMain extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 playerName = nameField.getText().trim();
                 if (playerName.isEmpty()) {
-                    playerName = "Player";
+                    playerName = "Player"; // Jika tidak ada nama yang dimasukkan, gunakan "Player"
                 }
-                homeDialog.dispose();
-                statusBar.setText("Welcome, " + playerName + "!");
+                playerNameLabel.setText("Player name: " + playerName); // Perbarui label nama pemain
+                homeDialog.dispose(); // Tutup dialog setelah nama dimasukkan
             }
         });
 

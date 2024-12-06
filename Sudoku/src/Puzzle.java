@@ -22,7 +22,7 @@ public class Puzzle {
     //  to control the difficulty level.
     // This method shall set (or update) the arrays numbers and isGiven
     public void newPuzzle() {
-        level = JOptionPane.showOptionDialog(null, "Choose your difficulty level", "Level", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"Easy", "Medium", "Hard"}, null);
+        level = JOptionPane.showOptionDialog(null, "Choose your difficulty level", "Level", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"Easy", "Medium", "Hard", "Super Hard"}, null);
         // Generate a random Sudoku grid
         generateRandomSudoku();
 
@@ -110,11 +110,13 @@ public class Puzzle {
         int cellsToRemove = 0;
 
         // Calculate how many cells need to be removed (30% will be removed)
-        if (level == 0) cellsToRemove = 5;
-        else if (level == 1) {
-            cellsToRemove = SudokuConstants.GRID_SIZE * SudokuConstants.GRID_SIZE / 5;
+        if(level == 0) cellsToRemove = 5;
+        else if(level == 1){
+            cellsToRemove = SudokuConstants.GRID_SIZE*SudokuConstants.GRID_SIZE/5;
+        } else if(level == 2){
+            cellsToRemove = SudokuConstants.GRID_SIZE * SudokuConstants.GRID_SIZE/2;
         } else {
-            cellsToRemove = SudokuConstants.GRID_SIZE * SudokuConstants.GRID_SIZE / 2;
+            cellsToRemove = (int) (SudokuConstants.GRID_SIZE * SudokuConstants.GRID_SIZE * 0.75);
         }
 
         Random rand = new Random();

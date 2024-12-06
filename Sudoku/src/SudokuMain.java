@@ -13,6 +13,9 @@
 
         // Constructor
         public SudokuMain() {
+
+            showHomePage();
+
             Container cp = getContentPane();
             cp.setLayout(new BorderLayout());
 
@@ -101,8 +104,35 @@
             fileMenu.add(exitItem);
             return menuBar;
         }
+
+        private void showHomePage(){
+            JDialog homeDialog = new JDialog(this, "Welcome to Sudoku", true);
+            homeDialog.setLayout(new BorderLayout());
+            JLabel welcomeLabel = new JLabel(
+                    "<html><h1>Welcome to Sudoku!</h1><p>How to play:</p>" +
+                            "<p>Fill in a 9x9 grid so that each column, row, and 3x3 subgrid " +
+                            "contains all digits from 1 to 9.</p></html>",
+                    SwingConstants.CENTER
+            );
+            homeDialog.add(welcomeLabel, BorderLayout.CENTER);
+
+            JButton startGameButton = new JButton("Start Game");
+            startGameButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    homeDialog.dispose();
+                }
+            });
+            homeDialog.add(startGameButton, BorderLayout.SOUTH);
+
+            homeDialog.setSize(800, 500);
+            homeDialog.setLocationRelativeTo(null);
+            homeDialog.setVisible(true);
+        }
+    }
+
         /** The entry main() entry method */
-        public static void main(String[] args) {
+        public void main(String[] args) {
             // [TODO 1] Check "Swing program template" on how to run
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -111,4 +141,3 @@
                 }
             });
         }
-    }

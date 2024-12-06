@@ -135,5 +135,3 @@ public class Puzzle {
         }
     }
 }
-//(For advanced students) use singleton design pattern for this class
-

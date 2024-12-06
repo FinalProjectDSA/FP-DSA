@@ -31,12 +31,6 @@
 
             JPopupMenu popupMenu = new JPopupMenu();
 
-            JOptionPane.showMessageDialog(this,
-                    "Welcome to Sudoku! \n" +
-                            "How to play this game: \nFill in a 9x9 grid so that each column, \neach row, and each of the nine 3x3 subgrids contains all of the digits from 1 to 9.",
-                    "Welcome to Sudoku",
-                    JOptionPane.INFORMATION_MESSAGE);
-
             cp.add(restartGame, BorderLayout.SOUTH);
 
             restartGame.addActionListener(new ActionListener() {
@@ -76,7 +70,6 @@
         }
 
 
-
         // Create the menu bar
         private JMenuBar createMenuBar() {
             JMenuBar menuBar = new JMenuBar();
@@ -105,34 +98,60 @@
             return menuBar;
         }
 
-        private void showHomePage(){
+        // Show home page dialog
+        private void showHomePage() {
             JDialog homeDialog = new JDialog(this, "Welcome to Sudoku", true);
-            homeDialog.setLayout(new BorderLayout());
+
+            // Load the background image as a resource
+            ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/homepagebg.jpg"));
+            Image backgroundImage = backgroundIcon.getImage();
+
+            // Create a custom panel to display the background image
+            JPanel backgroundPanel = new JPanel() {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    // Draw the background image scaled to the panel size
+                    g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+                }
+            };
+            backgroundPanel.setLayout(new BorderLayout()); // Set layout to add components
+
+            // Add content to the background panel
             JLabel welcomeLabel = new JLabel(
-                    "<html><h1>Welcome to Sudoku!</h1><p>How to play:</p>" +
-                            "<p>Fill in a 9x9 grid so that each column, row, and 3x3 subgrid " +
+                    "<html><h1 style='color:white;'>Welcome to Sudoku!</h1><p style='color:white;'>How to play:</p>" +
+                            "<p style='color:white;'>Fill in a 9x9 grid so that each column, row, and 3x3 subgrid " +
                             "contains all digits from 1 to 9.</p></html>",
                     SwingConstants.CENTER
             );
-            homeDialog.add(welcomeLabel, BorderLayout.CENTER);
+            welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            welcomeLabel.setVerticalAlignment(SwingConstants.CENTER);
 
+            // Add a transparent button over the background
             JButton startGameButton = new JButton("Start Game");
             startGameButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    homeDialog.dispose();
+                    homeDialog.dispose(); // Close the dialog when the button is clicked
                 }
             });
-            homeDialog.add(startGameButton, BorderLayout.SOUTH);
 
+            // Add components to the background panel
+            backgroundPanel.add(welcomeLabel, BorderLayout.CENTER);
+            backgroundPanel.add(startGameButton, BorderLayout.SOUTH);
+
+            // Set the background panel as the content pane
+            homeDialog.setContentPane(backgroundPanel);
             homeDialog.setSize(800, 500);
-            homeDialog.setLocationRelativeTo(null);
-            homeDialog.setVisible(true);
+            homeDialog.setLocationRelativeTo(null); // Center the dialog
+            homeDialog.setVisible(true); // Show the dialog
         }
-    }
 
-        /** The entry main() entry method */
-        public void main(String[] args) {
+
+        /**
+         * The entry main() entry method
+         */
+        public static void main(String[] args) {
             // [TODO 1] Check "Swing program template" on how to run
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -141,3 +160,4 @@
                 }
             });
         }
+    }

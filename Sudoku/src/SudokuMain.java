@@ -44,7 +44,6 @@
             setVisible(true);
         }
 
-
         // Create the menu bar
         private JMenuBar createMenuBar() {
             JMenuBar menuBar = new JMenuBar();

@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.border.Border;
 
 public class GameBoardPanel extends JPanel {
     private static final long serialVersionUID = 1L;  // to prevent serial warning
@@ -21,13 +22,16 @@ public class GameBoardPanel extends JPanel {
     public GameBoardPanel() {
         super.setLayout(new GridLayout(SudokuConstants.GRID_SIZE, SudokuConstants.GRID_SIZE));  // JPanel
 
-        // Allocate the 2D array of Cell, and added into JPanel.
+        // Allocate the 2D array of Cell, and add to the JPanel
         for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
             for (int col = 0; col < SudokuConstants.GRID_SIZE; ++col) {
                 cells[row][col] = new Cell(row, col);
-                super.add(cells[row][col]);   // JPanel
+                cells[row][col].setBorder(createCellBorder(row, col)); // Set the custom border
+                super.add(cells[row][col]);  // Add the cell to the panel
             }
         }
+
+        super.setPreferredSize(new Dimension(BOARD_WIDTH, BOARD_HEIGHT));
 
         // [TODO 3] Allocate a common listener as the ActionEvent listener for all the
         //  Cells (JTextFields)
@@ -43,7 +47,16 @@ public class GameBoardPanel extends JPanel {
         }
         super.setPreferredSize(new Dimension(BOARD_WIDTH, BOARD_HEIGHT));
     }
+    private Border createCellBorder(int row, int col) {
+        // Define the thickness for the borders
+        int top = (row % SudokuConstants.SUBGRID_SIZE == 0) ? 4 : 1;
+        int left = (col % SudokuConstants.SUBGRID_SIZE == 0) ? 4 : 1;
+        int bottom = (row == SudokuConstants.GRID_SIZE - 1) ? 4 : 1;
+        int right = (col == SudokuConstants.GRID_SIZE - 1) ? 4 : 1;
 
+        // Return a MatteBorder with the specified thickness
+        return BorderFactory.createMatteBorder(top, left, bottom, right, Color.LIGHT_GRAY);
+    }
     /**
      * Generate a new puzzle; and reset the game board of cells based on the puzzle.
      * You can call this method to start a new game.

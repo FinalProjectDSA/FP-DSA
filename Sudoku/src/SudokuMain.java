@@ -34,5 +34,11 @@ public class SudokuMain extends JFrame {
         // [TODO 1] Check "Swing program template" on how to run
         //  the constructor of "SudokuMain"
         // .........
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new SudokuMain(); // Create and show the GUI
+            }
+        });
     }
 }

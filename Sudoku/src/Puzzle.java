@@ -26,11 +26,14 @@ public class Puzzle {
         // Generate a random Sudoku grid
         generateRandomSudoku();
 
-        // Set the number of cells to keep as given (70% of total cells)
-        int cellsToGuess = (int) (SudokuConstants.GRID_SIZE * SudokuConstants.GRID_SIZE * 0.7);
-
         // Randomly make some cells "not given" (false) by removing their numbers
-        randomizePuzzle(cellsToGuess);
+
+        randomizePuzzle();
+    }
+
+    public void restartPuzzle(){
+        generateRandomSudoku();
+        randomizePuzzle();
     }
 
     // Generates a random Sudoku board using a backtracking approach
@@ -96,7 +99,7 @@ public class Puzzle {
     }
 
     // Randomly remove numbers from the grid to create the puzzle
-    private void randomizePuzzle(int cellsToGuess) {
+    private void randomizePuzzle() {
         // Set all cells to "given" initially (true)
         for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
             for (int col = 0; col < SudokuConstants.GRID_SIZE; ++col) {

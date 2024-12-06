@@ -9,7 +9,7 @@
 
         // private variables
         GameBoardPanel board = new GameBoardPanel();
-        JButton btnNewGame = new JButton("New Game");
+        JButton restartGame = new JButton("Restart Game");
 
         // Constructor
         public SudokuMain() {
@@ -27,7 +27,6 @@
             setVisible(true);
 
             JPopupMenu popupMenu = new JPopupMenu();
-            JMenuItem restartMenuItem = new JMenuItem("Restart Game");
 
             JOptionPane.showMessageDialog(this,
                     "Welcome to Sudoku! \n" +
@@ -35,16 +34,15 @@
                     "Welcome to Sudoku",
                     JOptionPane.INFORMATION_MESSAGE);
 
-            restartMenuItem.addActionListener(new ActionListener() {
+            cp.add(restartGame, BorderLayout.SOUTH);
+
+            restartGame.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    board.newGame();
+                    board.restartGame();
                 }
             });
 
-            cp.add(btnNewGame, BorderLayout.SOUTH);
-
-            popupMenu.add(restartMenuItem);
 
             board.addMouseListener(new MouseAdapter() {
                 @Override

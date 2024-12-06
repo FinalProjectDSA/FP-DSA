@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,6 +11,8 @@ public class Puzzle {
     // The clues - isGiven (no need to guess) or need to guess
     boolean[][] isGiven = new boolean[SudokuConstants.GRID_SIZE][SudokuConstants.GRID_SIZE];
 
+    private int level;
+
     // Constructor
     public Puzzle() {
         super();
@@ -19,6 +22,7 @@ public class Puzzle {
     //  to control the difficulty level.
     // This method shall set (or update) the arrays numbers and isGiven
     public void newPuzzle() {
+        level = JOptionPane.showOptionDialog(null, "Choose your difficulty level", "Level", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"Easy", "Medium", "Hard"}, null);
         // Generate a random Sudoku grid
         generateRandomSudoku();
 
@@ -100,8 +104,15 @@ public class Puzzle {
             }
         }
 
+        int cellsToRemove = 0;
+
         // Calculate how many cells need to be removed (30% will be removed)
-        int cellsToRemove = SudokuConstants.GRID_SIZE * SudokuConstants.GRID_SIZE - cellsToGuess;
+        if(level == 0) cellsToRemove = 5;
+        else if(level == 1){
+            cellsToRemove = SudokuConstants.GRID_SIZE*SudokuConstants.GRID_SIZE/5;
+        } else{
+            cellsToRemove = SudokuConstants.GRID_SIZE * SudokuConstants.GRID_SIZE/2;
+        }
 
         Random rand = new Random();
         int removedCells = 0;

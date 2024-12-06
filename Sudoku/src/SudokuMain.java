@@ -10,6 +10,8 @@
         // private variables
         GameBoardPanel board = new GameBoardPanel();
         JButton restartGame = new JButton("Restart Game");
+        private JLabel statusBar = new JLabel("Welcome to Sudoku!"); // Status bar
+        private String playerName = ""; // Player's name
 
         // Constructor
         public SudokuMain() {
@@ -115,30 +117,50 @@
                     g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
                 }
             };
-            backgroundPanel.setLayout(new BorderLayout()); // Set layout to add components
+            backgroundPanel.setLayout(new GridBagLayout()); // Use GridBagLayout for precise control
 
-            // Add content to the background panel
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.anchor = GridBagConstraints.CENTER;
+
+            // Add the welcome label in the center (vertically and horizontally)
+            gbc.gridy = 0;
+            gbc.weighty = 0.5; // Allow the message to take up half the available vertical space
             JLabel welcomeLabel = new JLabel(
                     "<html><h1 style='color:white;'>Welcome to Sudoku!</h1><p style='color:white;'>How to play:</p>" +
                             "<p style='color:white;'>Fill in a 9x9 grid so that each column, row, and 3x3 subgrid " +
                             "contains all digits from 1 to 9.</p></html>",
                     SwingConstants.CENTER
             );
-            welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            welcomeLabel.setVerticalAlignment(SwingConstants.CENTER);
+            backgroundPanel.add(welcomeLabel, gbc);
 
-            // Add a transparent button over the background
+            // Create a panel to hold the name field and the start button
+            JPanel inputPanel = new JPanel();
+            inputPanel.setLayout(new FlowLayout(FlowLayout.CENTER)); // Center the input components
+
+            // Add a text field for the player's name
+            JTextField nameField = new JTextField(20); // Set the width of the text field
+            inputPanel.add(nameField);
+
+            // Add a start game button
             JButton startGameButton = new JButton("Start Game");
+            inputPanel.add(startGameButton);
+
             startGameButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    homeDialog.dispose(); // Close the dialog when the button is clicked
+                    playerName = nameField.getText().trim();
+                    if (playerName.isEmpty()) {
+                        playerName = "Player";
+                    }
+                    statusBar.setText("Welcome, " + playerName + "!"); // Update the status bar
+                    homeDialog.dispose(); // Close the dialog
                 }
             });
 
-            // Add components to the background panel
-            backgroundPanel.add(welcomeLabel, BorderLayout.CENTER);
-            backgroundPanel.add(startGameButton, BorderLayout.SOUTH);
+            gbc.gridy = 1; // Move to the second row for input fields
+            gbc.weighty = 0.5; // Push the input panel to the bottom
+            backgroundPanel.add(inputPanel, gbc);
 
             // Set the background panel as the content pane
             homeDialog.setContentPane(backgroundPanel);
@@ -146,7 +168,6 @@
             homeDialog.setLocationRelativeTo(null); // Center the dialog
             homeDialog.setVisible(true); // Show the dialog
         }
-
 
         /**
          * The entry main() entry method

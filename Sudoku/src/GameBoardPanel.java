@@ -5,6 +5,8 @@ import javax.swing.border.Border;
 
 public class GameBoardPanel extends JPanel {
     private static final long serialVersionUID = 1L;  // to prevent serial warning
+    private int incorrectGuesses = 0; // Counter for incorrect guesses
+    private static final int MAX_INCORRECT_GUESSES = 3; // Maximum allowed incorrect guesses
 
     // Define named constants for UI sizes
     public static final int CELL_SIZE = 60;   // Cell width/height in pixels
@@ -118,9 +120,15 @@ public class GameBoardPanel extends JPanel {
              * and re-paint the cell via sourceCell.paint().
              */
             if (numberIn == sourceCell.number) {
-               sourceCell.status = CellStatus.CORRECT_GUESS;
+                sourceCell.status = CellStatus.CORRECT_GUESS;
             } else {
-               sourceCell.status = CellStatus.WRONG_GUESS;
+                sourceCell.status = CellStatus.WRONG_GUESS;
+                incorrectGuesses++; // Increment the incorrect guess counter
+                if (incorrectGuesses >= MAX_INCORRECT_GUESSES) {
+                    JOptionPane.showMessageDialog(null, "You've used all your chances! Game Over.", "Game Over", JOptionPane.WARNING_MESSAGE);
+                    disableAllCells(); // Disable all cells to prevent further input
+                    return; // Exit the method
+                }
             }
             sourceCell.paint();   // re-paint this cell based on its status
 
@@ -139,6 +147,13 @@ public class GameBoardPanel extends JPanel {
                     JOptionPane.showMessageDialog(null, "Thank You!");
                     System.exit(0); // Close the application
                 }
+            }
+        }
+    }
+    private void disableAllCells() {
+        for (int r = 0; r < SudokuConstants.GRID_SIZE; ++r) {
+            for (int c = 0; c < SudokuConstants.GRID_SIZE; ++c) {
+                cells[r][c].setEditable(false); // Disable editing
             }
         }
     }

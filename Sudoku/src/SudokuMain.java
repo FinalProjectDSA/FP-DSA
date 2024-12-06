@@ -26,13 +26,6 @@
             JMenuBar menuBar = createMenuBar();
             setJMenuBar(menuBar);
 
-            pack();     // Pack the UI components, instead of using setSize()
-            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  // to handle window-closing
-            setTitle("Sudoku");
-            setVisible(true);
-
-            JPopupMenu popupMenu = new JPopupMenu();
-
             cp.add(restartGame, BorderLayout.SOUTH);
 
             restartGame.addActionListener(new ActionListener() {
@@ -41,26 +34,6 @@
                     board.restartGame();
                 }
             });
-
-
-            board.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    showPopup(e);
-                }
-
-                @Override
-                public void mouseReleased(MouseEvent e) {
-                    showPopup(e);
-                }
-
-                private void showPopup(MouseEvent e) {
-                    if (e.isPopupTrigger()) { // Checks for right-click on different platforms
-                        popupMenu.show(e.getComponent(), e.getX(), e.getY());
-                    }
-                }
-            });
-
 
             // Initialize the game board to start the game
             board.newGame();

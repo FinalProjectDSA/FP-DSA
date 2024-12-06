@@ -85,6 +85,14 @@ public class GameBoardPanel extends JPanel {
                 }
             }
         }
+
+        JOptionPane.showMessageDialog(null, "Congrats, you solved it!", "Solved", JOptionPane.INFORMATION_MESSAGE);
+
+        int option = JOptionPane.showConfirmDialog(null, "Play Again?", "Restart", JOptionPane.YES_NO_OPTION);
+        if(option == JOptionPane.YES_OPTION){
+            newGame();
+        }
+
         return true;
     }
 

@@ -19,6 +19,14 @@
 
             cp.add(board, BorderLayout.CENTER);
 
+            JMenuBar menuBar = createMenuBar();
+            setJMenuBar(menuBar);
+
+            pack();     // Pack the UI components, instead of using setSize()
+            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  // to handle window-closing
+            setTitle("Sudoku");
+            setVisible(true);
+
             JPopupMenu popupMenu = new JPopupMenu();
             JMenuItem restartMenuItem = new JMenuItem("Restart Game");
 
@@ -74,6 +82,34 @@
                     JOptionPane.INFORMATION_MESSAGE);
         }
 
+
+        // Create the menu bar
+        private JMenuBar createMenuBar() {
+            JMenuBar menuBar = new JMenuBar();
+
+            // File menu
+            JMenu fileMenu = new JMenu("File");
+            menuBar.add(fileMenu);
+
+            // New Game Menu Item
+            JMenuItem newGameItem = new JMenuItem("New Game");
+            newGameItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    board.newGame(); // Start a new game
+                }
+            });
+            fileMenu.add(newGameItem);
+
+            // Exit Menu Item
+            JMenuItem exitItem = new JMenuItem("Exit");
+            exitItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    System.exit(0); // Exit the game
+                }
+            });
+            fileMenu.add(exitItem);
+            return menuBar;
+        }
         /** The entry main() entry method */
         public static void main(String[] args) {
             // [TODO 1] Check "Swing program template" on how to run

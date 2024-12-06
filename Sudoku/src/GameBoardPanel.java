@@ -5,6 +5,8 @@ import javax.swing.border.Border;
 
 public class GameBoardPanel extends JPanel {
     private static final long serialVersionUID = 1L;  // to prevent serial warning
+
+    private SudokuMain mainFrame;
     private int incorrectGuesses = 0; // Counter for incorrect guesses
     private static final int MAX_INCORRECT_GUESSES = 3; // Maximum allowed incorrect guesses
 
@@ -21,7 +23,8 @@ public class GameBoardPanel extends JPanel {
     private Puzzle puzzle = new Puzzle();
 
     /** Constructor */
-    public GameBoardPanel() {
+    public GameBoardPanel(SudokuMain mainFrame) {
+        this.mainFrame = mainFrame;
         super.setLayout(new GridLayout(SudokuConstants.GRID_SIZE, SudokuConstants.GRID_SIZE));  // JPanel
 
         // Allocate the 2D array of Cell, and add to the JPanel
@@ -66,6 +69,7 @@ public class GameBoardPanel extends JPanel {
     public void newGame() {
         // Generate a new puzzle
         puzzle.newPuzzle();
+        mainFrame.resetScore();
 
         // Initialize all the 9x9 cells, based on the puzzle.
         for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
@@ -77,6 +81,7 @@ public class GameBoardPanel extends JPanel {
 
     public void restartGame(){
         puzzle.restartPuzzle();
+        mainFrame.resetScore();
 
         // Initialize all the 9x9 cells, based on the puzzle.
         for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
@@ -121,8 +126,10 @@ public class GameBoardPanel extends JPanel {
              */
             if (numberIn == sourceCell.number) {
                 sourceCell.status = CellStatus.CORRECT_GUESS;
+                mainFrame.updateScore(50);
             } else {
                 sourceCell.status = CellStatus.WRONG_GUESS;
+                mainFrame.updateScore(-100);
                 incorrectGuesses++; // Increment the incorrect guess counter
                 if (incorrectGuesses >= MAX_INCORRECT_GUESSES) {
                     JOptionPane.showMessageDialog(null, "You've used all your chances! Game Over.", "Game Over", JOptionPane.WARNING_MESSAGE);

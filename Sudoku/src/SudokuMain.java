@@ -6,7 +6,7 @@ public class SudokuMain extends JFrame {
     private static final long serialVersionUID = 1L;
 
     // private variables
-    GameBoardPanel board = new GameBoardPanel();
+    GameBoardPanel board = new GameBoardPanel(this);
     JButton restartGame = new JButton("Restart Game");
     private JLabel scoreLabel = new JLabel("Score: "); // Score label
     private String playerName = ""; // Player's name
@@ -38,6 +38,7 @@ public class SudokuMain extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 board.restartGame();
+                resetScore();
             }
         });
 

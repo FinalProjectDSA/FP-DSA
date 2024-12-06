@@ -110,11 +110,11 @@ public class Puzzle {
         int cellsToRemove = 0;
 
         // Calculate how many cells need to be removed (30% will be removed)
-        if(level == 0) cellsToRemove = 5;
-        else if(level == 1){
-            cellsToRemove = SudokuConstants.GRID_SIZE*SudokuConstants.GRID_SIZE/5;
-        } else{
-            cellsToRemove = SudokuConstants.GRID_SIZE * SudokuConstants.GRID_SIZE/2;
+        if (level == 0) cellsToRemove = 5;
+        else if (level == 1) {
+            cellsToRemove = SudokuConstants.GRID_SIZE * SudokuConstants.GRID_SIZE / 5;
+        } else {
+            cellsToRemove = SudokuConstants.GRID_SIZE * SudokuConstants.GRID_SIZE / 2;
         }
 
         Random rand = new Random();
@@ -130,26 +130,6 @@ public class Puzzle {
                 isGiven[row][col] = false;
                 removedCells++;
             }
-        }
-    }
-
-    // (For testing) Print the Sudoku board
-    public void printBoard() {
-        for (int row = 0; row < SudokuConstants.GRID_SIZE; row++) {
-            for (int col = 0; col < SudokuConstants.GRID_SIZE; col++) {
-                System.out.print(numbers[row][col] + " ");
-            }
-            System.out.println();
-        }
-    }
-
-    // (For testing) Print the "isGiven" grid (clues vs to-guess cells)
-    public void printIsGiven() {
-        for (int row = 0; row < SudokuConstants.GRID_SIZE; row++) {
-            for (int col = 0; col < SudokuConstants.GRID_SIZE; col++) {
-                System.out.print((isGiven[row][col] ? "T " : "F "));
-            }
-            System.out.println();
         }
     }
 }

@@ -135,6 +135,9 @@ public class GameBoardPanel extends JPanel {
                 int option = JOptionPane.showConfirmDialog(null, "Play Again?", "Restart", JOptionPane.YES_NO_OPTION);
                 if(option == JOptionPane.YES_OPTION){
                     newGame();
+                } else{
+                    JOptionPane.showMessageDialog(null, "Thank You!");
+                    System.exit(0); // Close the application
                 }
             }
         }

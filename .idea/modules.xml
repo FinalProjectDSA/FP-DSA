@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/FP.iml" filepath="$PROJECT_DIR$/FP.iml" />
       <module fileurl="file://$PROJECT_DIR$/Sudoku/Sudoku.iml" filepath="$PROJECT_DIR$/Sudoku/Sudoku.iml" />
+      <module fileurl="file://$PROJECT_DIR$/TicTacToe/TicTacToe.iml" filepath="$PROJECT_DIR$/TicTacToe/TicTacToe.iml" />
     </modules>
   </component>
 </project>

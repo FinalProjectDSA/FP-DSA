@@ -42,6 +42,10 @@ public class GameMain extends JPanel {
                         currentState = board.stepGame(currentPlayer, row, col);
                         // Switch player
                         currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
+                        // Play appropriate sound clip
+                        if (currentState == State.PLAYING) {
+                            SoundEffect.WUP.play();
+                        }
                     }
                 } else {        // game over
                     newGame();  // restart the game
@@ -102,12 +106,15 @@ public class GameMain extends JPanel {
         } else if (currentState == State.DRAW) {
             statusBar.setForeground(Color.RED);
             statusBar.setText("It's a Draw! Click to play again.");
+            SoundEffect.TIE.play();
         } else if (currentState == State.CROSS_WON) {
             statusBar.setForeground(Color.RED);
             statusBar.setText("'X' Won! Click to play again.");
+            SoundEffect.WIN.play();
         } else if (currentState == State.NOUGHT_WON) {
             statusBar.setForeground(Color.RED);
             statusBar.setText("'O' Won! Click to play again.");
+            SoundEffect.WIN.play();
         }
     }
 

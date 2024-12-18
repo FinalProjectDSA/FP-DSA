@@ -47,4 +47,9 @@ public enum Seed {   // to save as "Seed.java"
     public Image getImage() {
         return img;
     }
+
+    // Method to set the display name dynamically
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
 }

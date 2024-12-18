@@ -26,6 +26,9 @@ public class GameMain extends JPanel {
 
     private boolean isDarkMode = false;
 
+    private String crossPlayerName = null;  // Store the name for Cross
+    private String noughtPlayerName = null;  // Store the name for Nought
+
     public GameMain() {
         setLayout(new BorderLayout());
         setBackground(COLOR_BG_LIGHT);
@@ -38,6 +41,7 @@ public class GameMain extends JPanel {
                 board.paint(g);
             }
         };
+
         gameBoardPanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT));
         gameBoardPanel.addMouseListener(new MouseAdapter() {
             @Override
@@ -136,33 +140,55 @@ public class GameMain extends JPanel {
     }
 
     public void newGame() {
+// Ask for player names or symbols only if they are not set
+        if (crossPlayerName == null || noughtPlayerName == null) {
+            crossPlayerName = JOptionPane.showInputDialog("Enter name for Player 1 (Cross, default 'X'):");
+            noughtPlayerName = JOptionPane.showInputDialog("Enter name for Player 2 (Nought, default 'O'):");
+
+            // Default to 'X' and 'O' if the input is empty
+            if (crossPlayerName == null || crossPlayerName.isEmpty()) crossPlayerName = "Player 1 (X)";
+            if (noughtPlayerName == null || noughtPlayerName.isEmpty()) noughtPlayerName = "Player 2 (O)";
+
+            // Update Seed enum display names dynamically
+            Seed.CROSS.setDisplayName(crossPlayerName);
+            Seed.NOUGHT.setDisplayName(noughtPlayerName);
+        }
+
+        // Reset the game board
         for (int row = 0; row < Board.ROWS; ++row) {
             for (int col = 0; col < Board.COLS; ++col) {
                 board.cells[row][col].content = Seed.NO_SEED;
             }
         }
-        currentPlayer = Seed.CROSS;
+
+        // Set initial player and game state
+        currentPlayer = Seed.CROSS;  // Player 1 (Cross) starts the game
         currentState = State.PLAYING;
-        statusBar.setText("X's Turn");
+        statusBar.setText(currentPlayer.getDisplayName() + "'s Turn");
     }
 
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+
+        // Paint the board
+        board.paint(g);
+
+        // Set status based on game state
         if (currentState == State.PLAYING) {
             statusBar.setForeground(Color.BLACK);
-            statusBar.setText((currentPlayer == Seed.CROSS) ? "X's Turn" : "O's Turn");
+            statusBar.setText(currentPlayer.getDisplayName() + "'s Turn");
         } else if (currentState == State.DRAW) {
             statusBar.setForeground(Color.RED);
             statusBar.setText("It's a Draw! Click to play again.");
             SoundEffect.TIE.play();
         } else if (currentState == State.CROSS_WON) {
             statusBar.setForeground(Color.RED);
-            statusBar.setText("'X' Won! Click to play again.");
+            statusBar.setText("'" + Seed.CROSS.getDisplayName() + "' Won! Click to play again.");
             SoundEffect.WIN.play();
         } else if (currentState == State.NOUGHT_WON) {
             statusBar.setForeground(Color.RED);
-            statusBar.setText("'O' Won! Click to play again.");
+            statusBar.setText("'" + Seed.NOUGHT.getDisplayName() + "' Won! Click to play again.");
             SoundEffect.WIN.play();
         }
     }

@@ -24,6 +24,7 @@ public class GameMain extends JPanel {
     private JMenu menu;
     private JMenuItem themeItem;
     private JMenuItem exitItem;
+    private BackgroundMusic backgroundMusic;
 
     private boolean isDarkMode = false;
 
@@ -33,6 +34,8 @@ public class GameMain extends JPanel {
     public GameMain() {
         setLayout(new BorderLayout());
         setBackground(COLOR_BG_LIGHT);
+        // Initialize background music
+        backgroundMusic = new BackgroundMusic("audio/bgm2.wav");  // path to your audio file
 
         // Game board panel
         JPanel gameBoardPanel = new JPanel() {
@@ -152,6 +155,7 @@ public class GameMain extends JPanel {
     }
 
     public void newGame() {
+        backgroundMusic.play();
         // Ask for player names or symbols only if they are not set
         if (crossPlayerName == null || noughtPlayerName == null) {
             crossPlayerName = JOptionPane.showInputDialog("Enter name for Player 1 (Cross, default 'X'):");
@@ -194,14 +198,17 @@ public class GameMain extends JPanel {
             statusBar.setForeground(Color.RED);
             statusBar.setText("It's a Draw! Click to play again.");
             SoundEffect.TIE.play();
+            backgroundMusic.stop();
         } else if (currentState == State.CROSS_WON) {
             statusBar.setForeground(Color.RED);
             statusBar.setText("'" + Seed.CROSS.getDisplayName() + "' Won! Click to play again.");
             SoundEffect.WIN.play();
+            backgroundMusic.stop();
         } else if (currentState == State.NOUGHT_WON) {
             statusBar.setForeground(Color.RED);
             statusBar.setText("'" + Seed.NOUGHT.getDisplayName() + "' Won! Click to play again.");
             SoundEffect.WIN.play();
+            backgroundMusic.stop();
         }
     }
 

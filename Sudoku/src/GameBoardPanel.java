@@ -1,3 +1,14 @@
+/**
+ * ES234317-Algorithm and Data Structures
+ * Semester Ganjil, 2024/2025
+ * Group Capstone Project
+ * Group #7
+ * 1 - 5026231011 - William Bryan Pangestu
+ * 2 - 5026231022 - Tiffany Catherine Prasetya
+ * 3 - 5026231081 - Oryza Reynaleta Wibowo
+ */
+
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -5,9 +16,10 @@ import javax.swing.border.Border;
 
 public class GameBoardPanel extends JPanel {
     private static final long serialVersionUID = 1L;  // to prevent serial warning
+
+    private SudokuMain mainFrame;
     private int incorrectGuesses = 0; // Counter for incorrect guesses
     private static final int MAX_INCORRECT_GUESSES = 3; // Maximum allowed incorrect guesses
-    private SoundEffect soundEffects = new SoundEffect();
 
     // Define named constants for UI sizes
     public static final int CELL_SIZE = 60;   // Cell width/height in pixels
@@ -22,7 +34,8 @@ public class GameBoardPanel extends JPanel {
     private Puzzle puzzle = new Puzzle();
 
     /** Constructor */
-    public GameBoardPanel() {
+    public GameBoardPanel(SudokuMain mainFrame) {
+        this.mainFrame = mainFrame;
         super.setLayout(new GridLayout(SudokuConstants.GRID_SIZE, SudokuConstants.GRID_SIZE));  // JPanel
 
         // Allocate the 2D array of Cell, and add to the JPanel
@@ -67,6 +80,7 @@ public class GameBoardPanel extends JPanel {
     public void newGame() {
         // Generate a new puzzle
         puzzle.newPuzzle();
+        mainFrame.resetScore();
 
         // Initialize all the 9x9 cells, based on the puzzle.
         for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
@@ -78,6 +92,7 @@ public class GameBoardPanel extends JPanel {
 
     public void restartGame(){
         puzzle.restartPuzzle();
+        mainFrame.resetScore();
 
         // Initialize all the 9x9 cells, based on the puzzle.
         for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
@@ -107,33 +122,46 @@ public class GameBoardPanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             // Get a reference of the JTextField that triggers this action event
-            Cell sourceCell = (Cell)e.getSource();
+            Cell sourceCell = (Cell) e.getSource();
 
-            // Retrieve the int entered
-            int numberIn = Integer.parseInt(sourceCell.getText());
-            // For debugging
-            System.out.println("You entered " + numberIn);
-
-            /*
-             * [TODO 5] (later - after TODO 3 and 4)
-             * Check the numberIn against sourceCell.number.
-             * Update the cell status sourceCell.status,
-             * and re-paint the cell via sourceCell.paint().
-             */
-            if (numberIn == sourceCell.number) {
-                sourceCell.status = CellStatus.CORRECT_GUESS;
-                soundEffects.playCorrectSound(); // Play correct sound
-            } else {
-                sourceCell.status = CellStatus.WRONG_GUESS;
-                incorrectGuesses++;
-                soundEffects.playWrongSound(); // Play wrong sound
-                if (incorrectGuesses >= MAX_INCORRECT_GUESSES) {
-                    JOptionPane.showMessageDialog(null, "You've used all your chances! Game Over.", "Game Over", JOptionPane.WARNING_MESSAGE);
-                    disableAllCells();
+            try {
+                int numberIn = Integer.parseInt(sourceCell.getText());
+                if (numberIn < 1 || numberIn > 9) {
+                    // Show warning if the number is outside the valid range
+                    JOptionPane.showMessageDialog(null, "Invalid input! Please enter a number between 1 and 9.",
+                            "Invalid Input", JOptionPane.WARNING_MESSAGE);
+                    sourceCell.setText(""); // Clear the invalid input
                     return;
                 }
+
+                // For debugging
+                System.out.println("You entered " + numberIn);
+
+                /*
+                 * [TODO 5] (later - after TODO 3 and 4)
+                 * Check the numberIn against sourceCell.number.
+                 * Update the cell status sourceCell.status,
+                 * and re-paint the cell via sourceCell.paint().
+                 */
+                if (numberIn == sourceCell.number) {
+                    sourceCell.status = CellStatus.CORRECT_GUESS;
+                    mainFrame.updateScore(50);
+                } else {
+                    sourceCell.status = CellStatus.WRONG_GUESS;
+                    mainFrame.updateScore(-100);
+                    incorrectGuesses++; // Increment the incorrect guess counter
+                    if (incorrectGuesses >= MAX_INCORRECT_GUESSES) {
+                        JOptionPane.showMessageDialog(null, "You've used all your chances! Game Over.", "Game Over", JOptionPane.WARNING_MESSAGE);
+                        disableAllCells(); // Disable all cells to prevent further input
+                        return; // Exit the method
+                    }
+                }
+                sourceCell.paint();// re-paint this cell based on its status
+            } catch (NumberFormatException ex){
+                JOptionPane.showMessageDialog(null, "Invalid input! Please enter a valid integer.",
+                        "Invalid Input", JOptionPane.WARNING_MESSAGE);
+                sourceCell.setText("");
             }
-            sourceCell.paint();   // re-paint this cell based on its status
 
             /*
              * [TODO 6] (later)

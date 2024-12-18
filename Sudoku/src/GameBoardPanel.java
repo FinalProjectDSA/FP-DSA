@@ -7,6 +7,7 @@ public class GameBoardPanel extends JPanel {
     private static final long serialVersionUID = 1L;  // to prevent serial warning
     private int incorrectGuesses = 0; // Counter for incorrect guesses
     private static final int MAX_INCORRECT_GUESSES = 3; // Maximum allowed incorrect guesses
+    private SoundEffect soundEffects = new SoundEffect();
 
     // Define named constants for UI sizes
     public static final int CELL_SIZE = 60;   // Cell width/height in pixels
@@ -121,13 +122,15 @@ public class GameBoardPanel extends JPanel {
              */
             if (numberIn == sourceCell.number) {
                 sourceCell.status = CellStatus.CORRECT_GUESS;
+                soundEffects.playCorrectSound(); // Play correct sound
             } else {
                 sourceCell.status = CellStatus.WRONG_GUESS;
-                incorrectGuesses++; // Increment the incorrect guess counter
+                incorrectGuesses++;
+                soundEffects.playWrongSound(); // Play wrong sound
                 if (incorrectGuesses >= MAX_INCORRECT_GUESSES) {
                     JOptionPane.showMessageDialog(null, "You've used all your chances! Game Over.", "Game Over", JOptionPane.WARNING_MESSAGE);
-                    disableAllCells(); // Disable all cells to prevent further input
-                    return; // Exit the method
+                    disableAllCells();
+                    return;
                 }
             }
             sourceCell.paint();   // re-paint this cell based on its status

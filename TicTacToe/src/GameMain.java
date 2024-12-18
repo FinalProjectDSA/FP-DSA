@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.net.URL;
 
 public class GameMain extends JPanel {
     private static final long serialVersionUID = 1L;
@@ -77,9 +78,11 @@ public class GameMain extends JPanel {
         restartButton.setBackground(null);
         restartButton.setFocusPainted(false);
         restartButton.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        restartButton.addActionListener(e -> {
-            newGame();
-            repaint();
+        restartButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                newGame();
+                repaint();
+            }
         });
 
         // Status bar and button panel
@@ -94,8 +97,17 @@ public class GameMain extends JPanel {
         themeItem = new JMenuItem("Switch to Dark Mode");
         exitItem = new JMenuItem("Exit");
 
-        themeItem.addActionListener(e -> toggleTheme());
-        exitItem.addActionListener(e -> System.exit(0));
+        themeItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                toggleTheme();
+            }
+        });
+
+        exitItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
 
         menu.add(themeItem);
         menu.add(exitItem);
@@ -140,7 +152,7 @@ public class GameMain extends JPanel {
     }
 
     public void newGame() {
-// Ask for player names or symbols only if they are not set
+        // Ask for player names or symbols only if they are not set
         if (crossPlayerName == null || noughtPlayerName == null) {
             crossPlayerName = JOptionPane.showInputDialog("Enter name for Player 1 (Cross, default 'X'):");
             noughtPlayerName = JOptionPane.showInputDialog("Enter name for Player 2 (Nought, default 'O'):");
@@ -193,7 +205,99 @@ public class GameMain extends JPanel {
         }
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(GameMain::new);
+    // Home page constructor and methods
+    public static class HomePage extends JFrame {
+
+        public HomePage() {
+            // Set up the frame
+            setTitle("Tic Tac Toe - Home");
+            setSize(500, 500);
+            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            setLocationRelativeTo(null);
+            setLayout(new BorderLayout());
+
+            // Add a background image
+            URL imgURL = getClass().getClassLoader().getResource("image/background");
+            JLabel background = null;
+            if (imgURL == null) {
+                System.err.println("Error: Couldn't find the background image file!");
+                getContentPane().setBackground(Color.LIGHT_GRAY); // Fallback background
+            } else {
+                background = new JLabel(new ImageIcon(imgURL));
+                background.setLayout(new BorderLayout());
+                add(background);
+            }
+
+            // Title label
+            JLabel titleLabel = new JLabel("Tic Tac Toe");
+            titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            titleLabel.setFont(new Font("Poppins", Font.BOLD, 40));
+            titleLabel.setForeground(Color.WHITE);
+            background.add(titleLabel, BorderLayout.NORTH);
+
+            // Button panel
+            JPanel buttonPanel = new JPanel(new GridLayout(3, 1, 10, 10));
+            buttonPanel.setOpaque(false);
+            buttonPanel.setLayout(new GridLayout(3, 1, 20, 20));
+            buttonPanel.setBorder(BorderFactory.createEmptyBorder(50, 100, 50, 100));
+
+
+            // Start button
+            JButton startButton = new JButton("Start Game");
+            startButton.setFont(new Font("Poppins", Font.BOLD, 18));
+            startButton.setBackground(new Color(255, 255, 255));
+            startButton.setForeground(Color.BLACK);
+            startButton.setFocusPainted(false);
+            startButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    dispose();
+                    new GameMain();
+                }
+            });
+
+            // Instructions button
+            JButton instructionsButton = new JButton("Instructions");
+            instructionsButton.setFont(new Font("Poppins", Font.BOLD, 18));
+            instructionsButton.setBackground(new Color(255, 255, 255));
+            instructionsButton.setForeground(Color.BLACK);
+            instructionsButton.setFocusPainted(false);
+            instructionsButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    JOptionPane.showMessageDialog(null, "Tic Tac Toe Instructions:\n\n"
+                            + "1. The game is played on a 3x3 grid.\n"
+                            + "2. Player X always goes first.\n"
+                            + "3. Players take turns placing their marks (X or O).\n"
+                            + "4. The first player to get 3 marks in a row (horizontally, vertically, or diagonally) wins.\n"
+                            + "5. If all 9 squares are filled and no player has 3 in a row, the game ends in a draw.");
+                }
+            });
+
+            // Exit button
+            JButton exitButton = new JButton("Exit");
+            exitButton.setFont(new Font("Poppins", Font.BOLD, 18));
+            exitButton.setBackground(new Color(255, 255, 255));
+            exitButton.setForeground(Color.BLACK);
+            exitButton.setFocusPainted(false);
+            exitButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    System.exit(0);
+                }
+            });
+
+            buttonPanel.add(startButton);
+            buttonPanel.add(instructionsButton);
+            buttonPanel.add(exitButton);
+
+            background.add(buttonPanel, BorderLayout.CENTER);
+        }
+
+        public static void main(String[] args) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    HomePage homePage = new HomePage();
+                    homePage.setVisible(true);
+                }
+            });
+        }
     }
 }

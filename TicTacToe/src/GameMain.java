@@ -6,8 +6,10 @@ public class GameMain extends JPanel {
     private static final long serialVersionUID = 1L;
 
     public static final String TITLE = "Tic Tac Toe";
-    public static final Color COLOR_BG = Color.WHITE;
-    public static final Color COLOR_BG_STATUS = new Color(216, 216, 216);
+    public static final Color COLOR_BG_LIGHT = Color.WHITE;
+    public static final Color COLOR_BG_DARK = new Color(30, 30, 30);
+    public static final Color COLOR_BG_STATUS_LIGHT = new Color(216, 216, 216);
+    public static final Color COLOR_BG_STATUS_DARK = new Color(50, 50, 50);
     public static final Color COLOR_CROSS = new Color(239, 105, 80);
     public static final Color COLOR_NOUGHT = new Color(64, 154, 225);
     public static final Font FONT_STATUS = new Font("OCR A Extended", Font.PLAIN, 14);
@@ -17,10 +19,16 @@ public class GameMain extends JPanel {
     private Seed currentPlayer;
     private JLabel statusBar;
     private JButton restartButton;
+    private JMenuBar menuBar;
+    private JMenu menu;
+    private JMenuItem themeItem;
+    private JMenuItem exitItem;
+
+    private boolean isDarkMode = false;
 
     public GameMain() {
         setLayout(new BorderLayout());
-        setBackground(COLOR_BG);
+        setBackground(COLOR_BG_LIGHT);
 
         // Game board panel
         JPanel gameBoardPanel = new JPanel() {
@@ -55,7 +63,7 @@ public class GameMain extends JPanel {
         statusBar = new JLabel();
         statusBar.setFont(FONT_STATUS);
         statusBar.setOpaque(true);
-        statusBar.setBackground(COLOR_BG_STATUS);
+        statusBar.setBackground(COLOR_BG_STATUS_LIGHT);
         statusBar.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         statusBar.setHorizontalAlignment(JLabel.LEFT);
 
@@ -72,16 +80,55 @@ public class GameMain extends JPanel {
 
         // Status bar and button panel
         JPanel bottomPanel = new JPanel(new BorderLayout());
-        bottomPanel.setBackground(COLOR_BG_STATUS);
+        bottomPanel.setBackground(COLOR_BG_STATUS_LIGHT);
         bottomPanel.add(statusBar, BorderLayout.CENTER);
         bottomPanel.add(restartButton, BorderLayout.EAST);
+
+        // Menu bar and items
+        menuBar = new JMenuBar();
+        menu = new JMenu("Menu");
+        themeItem = new JMenuItem("Switch to Dark Mode");
+        exitItem = new JMenuItem("Exit");
+
+        themeItem.addActionListener(e -> toggleTheme());
+        exitItem.addActionListener(e -> System.exit(0));
+
+        menu.add(themeItem);
+        menu.add(exitItem);
+        menuBar.add(menu);
 
         // Add components
         add(gameBoardPanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.PAGE_END);
 
+        // Set the menu bar
+        JFrame frame = new JFrame(TITLE);
+        frame.setJMenuBar(menuBar);
+        frame.setContentPane(this);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+
         initGame();
         newGame();
+    }
+
+    // Toggle between light and dark theme
+    private void toggleTheme() {
+        isDarkMode = !isDarkMode;
+        if (isDarkMode) {
+            setBackground(COLOR_BG_DARK);
+            statusBar.setBackground(COLOR_BG_STATUS_DARK);
+            statusBar.setForeground(Color.WHITE);
+            themeItem.setText("Switch to Light Mode");
+        } else {
+            setBackground(COLOR_BG_LIGHT);
+            statusBar.setBackground(COLOR_BG_STATUS_LIGHT);
+            statusBar.setForeground(Color.BLACK);
+            themeItem.setText("Switch to Dark Mode");
+        }
+        repaint();
     }
 
     public void initGame() {
@@ -121,13 +168,6 @@ public class GameMain extends JPanel {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame(TITLE);
-            frame.setContentPane(new GameMain());
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.pack();
-            frame.setLocationRelativeTo(null);
-            frame.setVisible(true);
-        });
+        SwingUtilities.invokeLater(GameMain::new);
     }
 }

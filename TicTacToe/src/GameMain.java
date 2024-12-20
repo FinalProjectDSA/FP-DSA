@@ -28,6 +28,7 @@ public class GameMain extends JPanel {
     private BackgroundMusic backgroundMusic;
 
     private boolean isDarkMode = false;
+    private boolean gameOverPopupShown = false;
     private boolean aiEnabled = false; // Toggle AI mode
     private String crossPlayerName = null; // Store the name for Cross
     private String noughtPlayerName = null; // Store the name for Nought
@@ -69,8 +70,6 @@ public class GameMain extends JPanel {
 
                         if (currentState == State.PLAYING) SoundEffect.WUP.play();
                     }
-                } else {
-                    newGame();
                 }
                 repaint();
             }
@@ -222,29 +221,76 @@ public class GameMain extends JPanel {
 
     @Override
     public void paintComponent(Graphics g) {
-        super.paintComponent(g);
+        super.paintComponent(g);  // Always call super for proper painting
         board.paint(g);
-
         if (currentState == State.PLAYING) {
             statusBar.setForeground(Color.BLACK);
             statusBar.setText(currentPlayer.getDisplayName() + "'s Turn");
-        } else if (currentState == State.DRAW) {
-            statusBar.setForeground(Color.RED);
-            statusBar.setText("It's a Draw! Click to play again.");
-            SoundEffect.TIE.play();
-            backgroundMusic.stop();
-        } else if (currentState == State.CROSS_WON) {
-            statusBar.setForeground(Color.RED);
-            statusBar.setText("'" + Seed.CROSS.getDisplayName() + "' Won!");
-            SoundEffect.WIN.play();
-            backgroundMusic.stop();
-        } else if (currentState == State.NOUGHT_WON) {
-            statusBar.setForeground(Color.RED);
-            statusBar.setText("'" + Seed.NOUGHT.getDisplayName() + "' Won!");
-            SoundEffect.WIN.play();
-            backgroundMusic.stop();
+        } else if (currentState != null && !gameOverPopupShown) {  // Check if the game is over
+            showGameOverPopup();  // Show the game over popup only if the game is actually over
         }
     }
+    public void showGameOverPopup() {
+        gameOverPopupShown = true;  // Prevent the pop-up from showing again
+
+        // Update the status bar message based on the game result
+        if (currentState == State.DRAW) {
+            statusBar.setForeground(Color.RED);
+            statusBar.setText("It's a Draw! Click to play again.");
+        } else if (currentState == State.CROSS_WON) {
+            statusBar.setForeground(Color.RED);
+            statusBar.setText("'" + Seed.CROSS.getDisplayName() + "' Won! Click to play again.");
+        } else if (currentState == State.NOUGHT_WON) {
+            statusBar.setForeground(Color.RED);
+            statusBar.setText("'" + Seed.NOUGHT.getDisplayName() + "' Won! Click to play again.");
+        }
+
+        // Create a JButton for "Play Again" or game restart
+        JButton playAgainButton = new JButton("Play Again");
+        playAgainButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Dispose of the parent frame before navigating
+                Window parentWindow = SwingUtilities.getWindowAncestor(statusBar);
+                if (parentWindow instanceof JFrame) {
+                    parentWindow.dispose(); // Close the current JFrame
+                }
+
+                // Open the game options page
+                HomePage home = new HomePage();
+                home.setVisible(true);
+                home.showGameOptions();
+            }
+        });
+
+        // Create a JButton for exiting the game
+        JButton exitButton = new JButton("Exit");
+        exitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Dispose of the parent frame before exiting
+                Window parentWindow = SwingUtilities.getWindowAncestor(statusBar);
+                if (parentWindow instanceof JFrame) {
+                    parentWindow.dispose(); // Close the current JFrame
+                }
+                System.exit(0); // Exit the application
+            }
+        });
+
+        // Display options in a dialog
+        Object[] options = {playAgainButton, exitButton};
+        JOptionPane.showOptionDialog(
+                this,
+                "Do you want to play again?",
+                "Game Over",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
+    }
+
 
     // Home page constructor and methods
     public static class HomePage extends JFrame {

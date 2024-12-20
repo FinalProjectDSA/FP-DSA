@@ -398,7 +398,7 @@ public class GameMain extends JPanel {
             }
 
             // Title label
-            JLabel titleLabel = new JLabel("Welcome!");
+            JLabel titleLabel = new JLabel("Welcome to OTW's World!");
             titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
             titleLabel.setFont(new Font("Poppins", Font.BOLD, 40));
             titleLabel.setForeground(Color.WHITE);
@@ -434,7 +434,12 @@ public class GameMain extends JPanel {
                             + "2. Player X always goes first.\n"
                             + "3. Players take turns placing their marks (X or O).\n"
                             + "4. The first player to get 3 marks in a row (horizontally, vertically, or diagonally) wins.\n"
-                            + "5. If all 9 squares are filled and no player has 3 in a row, the game ends in a draw.");
+                            + "5. If all 9 squares are filled and no player has 3 in a row, the game ends in a draw.\n\n"
+                            + "Connect 4 Instructions:\n\n"
+                            + "1. The game is played on a 7x6 grid.\n"
+                            + "2. Players take turns dropping their discs into one of the columns.\n"
+                            + "3. The first player to get 4 discs in a row (horizontally, vertically, or diagonally) wins.\n"
+                            + "4. If all 6 rows are filled and no player has 4 in a row, the game ends in a draw.");
                 }
             });
 

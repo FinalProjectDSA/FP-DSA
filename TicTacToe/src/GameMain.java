@@ -183,6 +183,7 @@ public class GameMain extends JPanel {
     // Start a new game
     public void newGame() {
         backgroundMusic.play();
+
         if (!aiEnabled) {
             // Ask for player names if AI is not enabled
             if (crossPlayerName == null || noughtPlayerName == null) {
@@ -195,16 +196,41 @@ public class GameMain extends JPanel {
                 Seed.CROSS.setDisplayName(crossPlayerName);
                 Seed.NOUGHT.setDisplayName(noughtPlayerName);
             }
+
+            // Add character selection popup
+            String crossCharacter = chooseCharacter(crossPlayerName + ", select your character:");
+            String noughtCharacter = chooseCharacter(noughtPlayerName + ", select your character (different from Player 1):");
+
+            while (crossCharacter.equals(noughtCharacter)) {
+                JOptionPane.showMessageDialog(null, "Both players cannot select the same character. Please choose again.");
+                noughtCharacter = chooseCharacter(noughtPlayerName + ", select your character (different from Player 1):");
+            }
+
+            Seed.CROSS.setImageFileName(crossCharacter);
+            Seed.NOUGHT.setImageFileName(noughtCharacter);
+
         } else {
-            // AI mode: only ask for Player 1's name
+            // AI mode: Only ask for Player 1's name
             if (crossPlayerName == null) {
                 crossPlayerName = JOptionPane.showInputDialog("Enter name for Player 1 (Cross, default 'X'): ");
                 if (crossPlayerName == null || crossPlayerName.isEmpty()) crossPlayerName = "Player 1 (X)";
                 Seed.CROSS.setDisplayName(crossPlayerName);
             }
 
-            // Set a default name for AI Player 2
+            // Add character selection for Player 1
+            String crossCharacter = chooseCharacter(crossPlayerName + ", select your character:");
+            Seed.CROSS.setImageFileName(crossCharacter);
+
+            // Default AI character
+            String aiCharacter = chooseCharacter("AI, select its character (different from Player 1):");
+
+            while (crossCharacter.equals(aiCharacter)) {
+                JOptionPane.showMessageDialog(null, "AI cannot select the same character as Player 1. Please choose again.");
+                aiCharacter = chooseCharacter("AI, select its character (different from Player 1):");
+            }
+
             Seed.NOUGHT.setDisplayName("Computer");
+            Seed.NOUGHT.setImageFileName(aiCharacter);
         }
 
         // Reset the game board
@@ -214,10 +240,39 @@ public class GameMain extends JPanel {
             }
         }
 
-        // Set initial player and game state
+        // Set the initial player and game state
         currentPlayer = Seed.CROSS; // Player 1 (Cross) starts the game
         currentState = State.PLAYING;
         statusBar.setText(currentPlayer.getDisplayName() + "'s Turn");
+    }
+
+    private String chooseCharacter(String message) {
+        // Character options (names)
+        String[] options = {"Oryza", "William", "Tiffany"};
+
+        // Corresponding image file paths for each character
+        String[] imagePaths = {"image/ory.gif", "image/webe.gif", "image/tiffy.gif"};
+
+        // Show the dialog with character names
+        int choice = JOptionPane.showOptionDialog(
+                null,
+                message,
+                "Character Selection",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
+
+        // Ensure a valid selection is made
+        if (choice < 0) {
+            JOptionPane.showMessageDialog(null, "You must select a character to proceed.");
+            return chooseCharacter(message); // Prompt again if no selection is made
+        }
+
+        // Return the corresponding image file path based on the selected character
+        return imagePaths[choice];
     }
 
     // Method to handle AI's move
@@ -250,6 +305,7 @@ public class GameMain extends JPanel {
         }
     }
     public void showGameOverPopup() {
+        BackgroundMusic.stop();
         gameOverPopupShown = true;  // Prevent the pop-up from showing again
 
         // Update the status bar message based on the game result

@@ -318,6 +318,7 @@ public class GameMain extends JPanel {
         private JButton startButton;
         private JButton playerVsPlayerButton;
         private JButton playerVsAiButton;
+        private JButton connect4Button; // Button for Connect 4
         private JButton exitButton;
 
         public HomePage() {
@@ -348,9 +349,9 @@ public class GameMain extends JPanel {
             background.add(titleLabel, BorderLayout.NORTH);
 
             // Button panel
-            buttonPanel = new JPanel(new GridLayout(3, 1, 10, 10)); // Initially, we have only 3 buttons
+            buttonPanel = new JPanel(new GridLayout(4, 1, 10, 10)); // Initially, we have only 3 buttons
             buttonPanel.setOpaque(false);
-            buttonPanel.setLayout(new GridLayout(3, 1, 20, 20));  // Adjusted for 3 buttons initially
+            buttonPanel.setLayout(new GridLayout(4, 1, 20, 20));  // Adjusted for 3 buttons initially
             buttonPanel.setBorder(BorderFactory.createEmptyBorder(50, 100, 50, 100));
 
             // Start Game button
@@ -381,6 +382,19 @@ public class GameMain extends JPanel {
                 }
             });
 
+            // Connect 4 button
+            connect4Button = new JButton("Connect 4");
+            connect4Button.setFont(new Font("Poppins", Font.BOLD, 18));
+            connect4Button.setBackground(new Color(255, 255, 255));
+            connect4Button.setForeground(Color.BLACK);
+            connect4Button.setFocusPainted(false);
+            connect4Button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    dispose();  // Close the home page
+                    new TTTGraphics(); // Start Connect 4 game
+                }
+            });
+
             // Exit button
             exitButton = new JButton("Exit");
             exitButton.setFont(new Font("Poppins", Font.BOLD, 18));
@@ -394,6 +408,7 @@ public class GameMain extends JPanel {
             });
 
             buttonPanel.add(startButton);
+            buttonPanel.add(connect4Button); // Add Connect 4 button
             buttonPanel.add(instructionsButton);
             buttonPanel.add(exitButton);
 

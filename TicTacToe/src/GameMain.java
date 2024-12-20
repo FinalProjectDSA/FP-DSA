@@ -1,8 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Random;
 import java.net.URL;
 
 
@@ -27,10 +25,11 @@ public class GameMain extends JPanel {
     private JMenu menu;
     private JMenuItem themeItem;
     private JMenuItem exitItem;
-    private JMenuItem aiToggleItem;  // New menu item for AI toggle
+    private JMenuItem aiToggleItem; // New menu item for AI toggle
     private BackgroundMusic backgroundMusic;
 
     private boolean isDarkMode = false;
+<<<<<<< HEAD
     private boolean gameOverPopupShown = false;  // Flag to track if popup has been shown
 
     private boolean aiEnabled = false;  // Toggle AI mode
@@ -38,6 +37,11 @@ public class GameMain extends JPanel {
     private String noughtPlayerName = null;  // Store the name for Nought
 
     private Random random = new Random();  // Random object for AI move
+=======
+    private boolean aiEnabled = false; // Toggle AI mode
+    private String crossPlayerName = null; // Store the name for Cross
+    private String noughtPlayerName = null; // Store the name for Nought
+>>>>>>> 623ca4637c72cce0995a1a72217f80935a766b37
 
     public GameMain(boolean aienabled) {
         this.aiEnabled = aienabled;
@@ -45,9 +49,14 @@ public class GameMain extends JPanel {
         setLayout(new BorderLayout());
         setBackground(COLOR_BG_LIGHT);
         // Initialize background music
+<<<<<<< HEAD
         backgroundMusic = new BackgroundMusic("audio/bgm2.wav");  // path to your audio file
         // Preload sound effects to prevent delay
         SoundEffect.preloadAll();
+=======
+        backgroundMusic = new BackgroundMusic("audio/bgm2.wav"); // path to your audio file
+
+>>>>>>> 623ca4637c72cce0995a1a72217f80935a766b37
         // Game board panel
         JPanel gameBoardPanel = new JPanel() {
             @Override
@@ -103,23 +112,28 @@ public class GameMain extends JPanel {
             }
         });
 
+        // Create a panel to hold the status bar and restart button
+        JPanel statusPanel = new JPanel(new BorderLayout());
+        statusPanel.add(statusBar, BorderLayout.CENTER);
+        statusPanel.add(restartButton, BorderLayout.EAST);
+
         // Menu bar and items
         menuBar = new JMenuBar();
         menu = new JMenu("Menu");
         themeItem = new JMenuItem("Switch to Dark Mode");
         exitItem = new JMenuItem("Exit");
-        aiToggleItem = new JMenuItem("Play vs AI");  // New menu item for AI toggle
+        aiToggleItem = new JMenuItem("Play vs AI"); // New menu item for AI toggle
 
         // Toggle AI mode
         aiToggleItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                aiEnabled = !aiEnabled;  // Toggle AI mode
+                aiEnabled = !aiEnabled; // Toggle AI mode
                 if (aiEnabled) {
                     aiToggleItem.setText("Play vs Human");
                 } else {
                     aiToggleItem.setText("Play vs AI");
                 }
-                newGame();  // Restart the game with the updated AI mode
+                newGame(); // Restart the game with the updated AI mode
             }
         });
 
@@ -130,14 +144,13 @@ public class GameMain extends JPanel {
         });
 
         menu.add(themeItem);
-        menu.add(aiToggleItem);  // Add AI toggle to the menu
+        menu.add(aiToggleItem); // Add AI toggle to the menu
         menu.add(exitItem);
         menuBar.add(menu);
 
         // Add components
         add(gameBoardPanel, BorderLayout.CENTER);
-        add(statusBar, BorderLayout.PAGE_END);
-        add(restartButton, BorderLayout.SOUTH);
+        add(statusPanel, BorderLayout.PAGE_END);
 
         // Set the menu bar
         JFrame frame = new JFrame(TITLE);
@@ -199,7 +212,7 @@ public class GameMain extends JPanel {
         }
 
         // Set initial player and game state
-        currentPlayer = Seed.CROSS;  // Player 1 (Cross) starts the game
+        currentPlayer = Seed.CROSS; // Player 1 (Cross) starts the game
         currentState = State.PLAYING;
         statusBar.setText(currentPlayer.getDisplayName() + "'s Turn");
     }
@@ -208,28 +221,18 @@ public class GameMain extends JPanel {
     private void makeAIMove() {
         if (currentState != State.PLAYING) return;
 
-        // AI logic: make a random valid move
-        ArrayList<Point> emptyCells = new ArrayList<>();
-        for (int row = 0; row < Board.ROWS; ++row) {
-            for (int col = 0; col < Board.COLS; ++col) {
-                if (board.cells[row][col].content == Seed.NO_SEED) {
-                    emptyCells.add(new Point(row, col));
-                }
-            }
-        }
+        // Use Minimax for AI move
+        AIPlayerMinimax aiPlayer = new AIPlayerMinimax(board); // AI plays as NOUGHT (O)
+        int[] aiMove = aiPlayer.move();
+        int row = aiMove[0];
+        int col = aiMove[1];
 
-        if (emptyCells.size() > 0) {
-            Point move = emptyCells.get(random.nextInt(emptyCells.size()));
-            int row = move.x;
-            int col = move.y;
-
-            currentState = board.stepGame(currentPlayer, row, col);
-            currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
-            if (currentState == State.PLAYING) {
-                statusBar.setText(currentPlayer.getDisplayName() + "'s Turn");
-            }
-            repaint();
+        currentState = board.stepGame(currentPlayer, row, col);
+        currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
+        if (currentState == State.PLAYING) {
+            statusBar.setText(currentPlayer.getDisplayName() + "'s Turn");
         }
+        repaint();
     }
 
     // Modify the `paintComponent` method
@@ -241,9 +244,27 @@ public class GameMain extends JPanel {
         if (currentState == State.PLAYING) {
             statusBar.setForeground(Color.BLACK);
             statusBar.setText(currentPlayer.getDisplayName() + "'s Turn");
+<<<<<<< HEAD
         } else if (currentState != null && !gameOverPopupShown) {  // Check if the game is over
             showGameOverPopup();  // Show the game over popup only if the game is actually over
             gameOverPopupShown = true;  // Prevent the pop-up from showing again
+=======
+        } else if (currentState == State.DRAW) {
+            statusBar.setForeground(Color.RED);
+            statusBar.setText("It's a Draw! Click to play again.");
+            SoundEffect.TIE.play();
+            backgroundMusic.stop();
+        } else if (currentState == State.CROSS_WON) {
+            statusBar.setForeground(Color.RED);
+            statusBar.setText("'" + Seed.CROSS.getDisplayName() + "' Won!");
+            SoundEffect.WIN.play();
+            backgroundMusic.stop();
+        } else if (currentState == State.NOUGHT_WON) {
+            statusBar.setForeground(Color.RED);
+            statusBar.setText("'" + Seed.NOUGHT.getDisplayName() + "' Won!");
+            SoundEffect.WIN.play();
+            backgroundMusic.stop();
+>>>>>>> 623ca4637c72cce0995a1a72217f80935a766b37
         }
     }
 

@@ -106,7 +106,8 @@ public class GameMain extends JPanel {
         menu = new JMenu("Menu");
         themeItem = new JMenuItem("Switch to Dark Mode");
         exitItem = new JMenuItem("Exit");
-        aiToggleItem = new JMenuItem("Play vs AI"); // New menu item for AI toggle
+        // Initialize the AI toggle menu item with dynamic text based on the current AI mode
+        aiToggleItem = new JMenuItem(aiEnabled ? "Play vs Human" : "Play vs AI");
 
         // Toggle AI mode
         aiToggleItem.addActionListener(new ActionListener() {
@@ -117,7 +118,7 @@ public class GameMain extends JPanel {
                 } else {
                     aiToggleItem.setText("Play vs AI");
                 }
-                newGame(); // Restart the game with the updated AI mode
+                newGame(); // Reset the game after toggling AI mode
             }
         });
 

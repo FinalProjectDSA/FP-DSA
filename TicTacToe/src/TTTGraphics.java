@@ -1,6 +1,8 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class TTTGraphics extends JFrame {
     private static final long serialVersionUID = 1L;
@@ -23,6 +25,7 @@ public class TTTGraphics extends JFrame {
     }
 
     private State currentState;
+    private int[] highlightCells = null;
 
     public enum Seed {
         CROSS, NOUGHT, NO_SEED
@@ -34,6 +37,15 @@ public class TTTGraphics extends JFrame {
     private GamePanel gamePanel;
     private JLabel statusBar;
     private JButton resetButton;
+    private JButton exitButton;
+
+    private int redScore = 0;
+    private int yellowScore = 0;
+    private JLabel scoreLabel;
+
+    private Timer turnTimer;
+    private JLabel timerLabel;
+    private int timeRemaining;
 
     public TTTGraphics() {
         initGame();
@@ -54,6 +66,7 @@ public class TTTGraphics extends JFrame {
                                 board[row][colSelected] = currentPlayer;
                                 currentState = stepGame(currentPlayer, row, colSelected);
                                 currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
+                                resetTimer();
                                 break;
                             }
                         }
@@ -71,21 +84,44 @@ public class TTTGraphics extends JFrame {
         statusBar.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         statusBar.setForeground(Color.WHITE);
 
+        scoreLabel = new JLabel("Red: 0 | Yellow: 0");
+        scoreLabel.setFont(FONT_STATUS);
+        scoreLabel.setForeground(Color.WHITE);
+
+        timerLabel = new JLabel("Time Remaining: 10");
+        timerLabel.setFont(FONT_STATUS);
+        timerLabel.setForeground(Color.WHITE);
+
         resetButton = new JButton("Restart Game");
         resetButton.setFont(FONT_STATUS);
         resetButton.setBackground(Color.WHITE);
         resetButton.setForeground(COLOR_GRID);
         resetButton.addActionListener(e -> newGame());
 
+        exitButton = new JButton("Exit Game");
+        exitButton.setFont(FONT_STATUS);
+        exitButton.setBackground(Color.WHITE);
+        exitButton.setForeground(COLOR_GRID);
+        exitButton.addActionListener(e -> System.exit(0));
+
         JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.add(statusBar, BorderLayout.CENTER);
-        bottomPanel.add(resetButton, BorderLayout.EAST);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(resetButton);
+        buttonPanel.add(exitButton);
+        bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
         bottomPanel.setBackground(COLOR_BG);
+
+        JPanel topPanel = new JPanel(new GridLayout(1, 2));
+        topPanel.add(scoreLabel);
+        topPanel.add(timerLabel);
+        topPanel.setBackground(COLOR_BG);
 
         Container cp = getContentPane();
         cp.setLayout(new BorderLayout());
         cp.add(gamePanel, BorderLayout.CENTER);
         cp.add(bottomPanel, BorderLayout.SOUTH);
+        cp.add(topPanel, BorderLayout.NORTH);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         pack();
@@ -107,7 +143,10 @@ public class TTTGraphics extends JFrame {
         }
         currentPlayer = Seed.CROSS;
         currentState = State.PLAYING;
+        highlightCells = null;
         statusBar.setText("Red's Turn");
+        updateScores();
+        resetTimer();
         repaint();
     }
 
@@ -115,6 +154,8 @@ public class TTTGraphics extends JFrame {
         board[selectedRow][selectedCol] = player;
 
         if (hasWon(player, selectedRow, selectedCol)) {
+            if (player == Seed.CROSS) redScore++;
+            else yellowScore++;
             return (player == Seed.CROSS) ? State.CROSS_WON : State.NOUGHT_WON;
         } else {
             for (int row = 0; row < ROWS; ++row) {
@@ -129,36 +170,75 @@ public class TTTGraphics extends JFrame {
     }
 
     public boolean hasWon(Seed theSeed, int rowSelected, int colSelected) {
-        return checkDirection(theSeed, rowSelected, colSelected, 0, 1) ||
-                checkDirection(theSeed, rowSelected, colSelected, 1, 0) ||
-                checkDirection(theSeed, rowSelected, colSelected, 1, 1) ||
-                checkDirection(theSeed, rowSelected, colSelected, 1, -1);
+        highlightCells = checkHighlightDirection(theSeed, rowSelected, colSelected);
+        return highlightCells != null;
     }
 
-    private boolean checkDirection(Seed theSeed, int row, int col, int rowIncrement, int colIncrement) {
-        int count = 1;
+    private int[] checkHighlightDirection(Seed theSeed, int row, int col) {
+        int[][] directions = {{0, 1}, {1, 0}, {1, 1}, {1, -1}}; // {dx, dy} pairs
+        for (int[] direction : directions) {
+            int count = 1;
+            int[] cells = new int[8];
+            cells[0] = row;
+            cells[1] = col;
 
-        for (int i = 1; i < 4; i++) {
-            int r = row + i * rowIncrement;
-            int c = col + i * colIncrement;
-            if (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c] == theSeed) {
-                count++;
-            } else {
-                break;
+            // Cek ke satu arah
+            for (int i = 1; i < 4; i++) {
+                int r = row + i * direction[0];
+                int c = col + i * direction[1];
+                if (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c] == theSeed) {
+                    cells[count * 2] = r;
+                    cells[count * 2 + 1] = c;
+                    count++;
+                } else {
+                    break;
+                }
             }
-        }
 
-        for (int i = 1; i < 4; i++) {
-            int r = row - i * rowIncrement;
-            int c = col - i * colIncrement;
-            if (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c] == theSeed) {
-                count++;
-            } else {
-                break;
+            // Cek ke arah berlawanan
+            for (int i = 1; i < 4; i++) {
+                int r = row - i * direction[0];
+                int c = col - i * direction[1];
+                if (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c] == theSeed) {
+                    cells[count * 2] = r;
+                    cells[count * 2 + 1] = c;
+                    count++;
+                } else {
+                    break;
+                }
             }
-        }
 
-        return count >= 4;
+            if (count >= 4) return cells; // Jika ditemukan 4 berturut-turut
+        }
+        return null; // Tidak ditemukan 4 berturut-turut
+    }
+
+    private void updateScores() {
+        scoreLabel.setText("Red: " + redScore + " | Yellow: " + yellowScore);
+    }
+
+    private void resetTimer() {
+        if (turnTimer != null) turnTimer.cancel();
+        timeRemaining = 10;
+        timerLabel.setText("Time Remaining: " + timeRemaining);
+
+        turnTimer = new Timer();
+        turnTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (timeRemaining > 0) {
+                    timeRemaining--;
+                    SwingUtilities.invokeLater(() -> timerLabel.setText("Time Remaining: " + timeRemaining));
+                } else {
+                    turnTimer.cancel();
+                    SwingUtilities.invokeLater(() -> {
+                        currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
+                        resetTimer();
+                        repaint();
+                    });
+                }
+            }
+        }, 1000, 1000);
     }
 
     class GamePanel extends JPanel {
@@ -191,6 +271,15 @@ public class TTTGraphics extends JFrame {
                         g2d.setColor(COLOR_NOUGHT);
                         g2d.fillOval(x1, y1, CELL_SIZE - CELL_SIZE / 4, CELL_SIZE - CELL_SIZE / 4);
                     }
+                }
+            }
+
+            if (highlightCells != null) {
+                g.setColor(Color.GREEN);
+                for (int i = 0; i < highlightCells.length; i += 2) {
+                    int x1 = highlightCells[i + 1] * CELL_SIZE + CELL_SIZE / 8;
+                    int y1 = highlightCells[i] * CELL_SIZE + CELL_SIZE / 8;
+                    g.fillOval(x1, y1, CELL_SIZE - CELL_SIZE / 4, CELL_SIZE - CELL_SIZE / 4);
                 }
             }
 

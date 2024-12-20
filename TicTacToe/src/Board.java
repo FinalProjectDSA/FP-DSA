@@ -35,15 +35,6 @@ public class Board {
         }
     }
 
-    /** Reset the game board, ready for new game */
-    public void newGame() {
-        for (int row = 0; row < ROWS; ++row) {
-            for (int col = 0; col < COLS; ++col) {
-                cells[row][col].newGame(); // clear the cell content
-            }
-        }
-    }
-
     /**
      *  The given player makes a move on (selectedRow, selectedCol).
      *  Update cells[selectedRow][selectedCol]. Compute and return the

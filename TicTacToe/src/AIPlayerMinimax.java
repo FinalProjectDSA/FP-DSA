@@ -1,4 +1,5 @@
 import java.util.*;
+
 /** AIPlayer using Minimax algorithm */
 public class AIPlayerMinimax extends AIPlayer {
 
@@ -16,52 +17,13 @@ public class AIPlayerMinimax extends AIPlayer {
     }
 
     /** Minimax (recursive) at level of depth for maximizing or minimizing player
-     with alpha-beta cut-off. Return int[3] of {score, row, col}  */
+     * with alpha-beta cut-off. Return int[3] of {score, row, col} */
     private int[] minimax(int depth, Seed player, int alpha, int beta) {
-        // Generate possible next moves in a list of int[2] of {row, col}.
-        List<int[]> nextMoves = generateMoves();
-
-        // mySeed is maximizing; while oppSeed is minimizing
-        int score;
-        int bestRow = -1;
-        int bestCol = -1;
-
-        if (nextMoves.isEmpty() || depth == 0) {
-            // Gameover or depth reached, evaluate score
-            score = evaluate();
-            return new int[] {score, bestRow, bestCol};
-        } else {
-            for (int[] move : nextMoves) {
-                // try this move for the current "player"
-                cells[move[0]][move[1]].content = player;
-                if (player == mySeed) {  // mySeed (computer) is maximizing player
-                    score = minimax(depth - 1, oppSeed, alpha, beta)[0];
-                    if (score > alpha) {
-                        alpha = score;
-                        bestRow = move[0];
-                        bestCol = move[1];
-                    }
-                } else {  // oppSeed is minimizing player
-                    score = minimax(depth - 1, mySeed, alpha, beta)[0];
-                    if (score < beta) {
-                        beta = score;
-                        bestRow = move[0];
-                        bestCol = move[1];
-                    }
-                }
-                // undo move
-                cells[move[0]][move[1]].content = Seed.NO_SEED;
-                // cut-off
-                if (alpha >= beta) break;
-            }
-            return new int[] {(player == mySeed) ? alpha : beta, bestRow, bestCol};
+        if (depth == 0 || isCloseToEndGame()) {
+            return new int[] {evaluate(), -1, -1};  // Return evaluation when depth is zero or end game
         }
-    }
 
-    /** Recursive minimax at level of depth for either maximizing or minimizing player.
-     Return int[3] of {score, row, col}  */
-    private int[] minimax(int depth, Seed player) {
-        // Generate possible next moves in a List of int[2] of {row, col}.
+        // Generate possible next moves in a list of int[2] of {row, col}.
         List<int[]> nextMoves = generateMoves();
 
         // mySeed is maximizing; while oppSeed is minimizing
@@ -70,37 +32,40 @@ public class AIPlayerMinimax extends AIPlayer {
         int bestRow = -1;
         int bestCol = -1;
 
-        if (nextMoves.isEmpty() || depth == 0) {
-            // Gameover or depth reached, evaluate score
-            bestScore = evaluate();
-        } else {
-            for (int[] move : nextMoves) {
-                // Try this move for the current "player"
-                cells[move[0]][move[1]].content = player;
-                if (player == mySeed) {  // mySeed (computer) is maximizing player
-                    currentScore = minimax(depth - 1, oppSeed)[0];
-                    if (currentScore > bestScore) {
-                        bestScore = currentScore;
-                        bestRow = move[0];
-                        bestCol = move[1];
-                    }
-                } else {  // oppSeed is minimizing player
-                    currentScore = minimax(depth - 1, mySeed)[0];
-                    if (currentScore < bestScore) {
-                        bestScore = currentScore;
-                        bestRow = move[0];
-                        bestCol = move[1];
-                    }
+        for (int[] move : nextMoves) {
+            // Try this move for the current "player"
+            cells[move[0]][move[1]].content = player;
+
+            if (player == mySeed) {  // mySeed (computer) is maximizing player
+                currentScore = minimax(depth - 1, oppSeed, alpha, beta)[0];
+                if (currentScore > bestScore) {
+                    bestScore = currentScore;
+                    bestRow = move[0];
+                    bestCol = move[1];
                 }
-                // Undo move
-                cells[move[0]][move[1]].content = Seed.NO_SEED;
+                alpha = Math.max(alpha, bestScore);
+            } else {  // oppSeed is minimizing player
+                currentScore = minimax(depth - 1, mySeed, alpha, beta)[0];
+                if (currentScore < bestScore) {
+                    bestScore = currentScore;
+                    bestRow = move[0];
+                    bestCol = move[1];
+                }
+                beta = Math.min(beta, bestScore);
             }
+
+            // Undo move
+            cells[move[0]][move[1]].content = Seed.NO_SEED;
+
+            // Alpha-Beta Pruning
+            if (alpha >= beta) break;
         }
+
         return new int[] {bestScore, bestRow, bestCol};
     }
 
     /** Find all valid next moves.
-     Return List of moves in int[2] of {row, col} or empty list if gameover */
+     * Return List of moves in int[2] of {row, col} or empty list if gameover */
     private List<int[]> generateMoves() {
         List<int[]> nextMoves = new ArrayList<int[]>(); // allocate List
 
@@ -113,6 +78,15 @@ public class AIPlayerMinimax extends AIPlayer {
         for (int row = 0; row < ROWS; ++row) {
             for (int col = 0; col < COLS; ++col) {
                 if (cells[row][col].content == Seed.NO_SEED) {
+                    cells[row][col].content = oppSeed;  // Simulate opponent move
+                    if (hasWon(oppSeed)) {
+                        // High priority for blocking opponent's win
+                        nextMoves.clear();
+                        nextMoves.add(new int[] {row, col});
+                        cells[row][col].content = Seed.NO_SEED;  // Undo simulation
+                        return nextMoves;
+                    }
+                    cells[row][col].content = Seed.NO_SEED;  // Undo simulation
                     nextMoves.add(new int[] {row, col});
                 }
             }
@@ -121,12 +95,20 @@ public class AIPlayerMinimax extends AIPlayer {
     }
 
     /** The heuristic evaluation function for the current board
-     @Return +100, +10, +1 for EACH 3-, 2-, 1-in-a-line for computer.
-     -100, -10, -1 for EACH 3-, 2-, 1-in-a-line for opponent.
-     0 otherwise   */
+     * Return +100, +10, +1 for EACH 3-, 2-, 1-in-a-line for computer.
+     * -100, -10, -1 for EACH 3-, 2-, 1-in-a-line for opponent.
+     * 0 otherwise */
     private int evaluate() {
         int score = 0;
-        // Evaluate score for each of the 8 lines (3 rows, 3 columns, 2 diagonals)
+
+        // Evaluate center position
+        if (cells[1][1].content == mySeed) {
+            score += 3;  // Center is more valuable
+        } else if (cells[1][1].content == oppSeed) {
+            score -= 3;
+        }
+
+        // Evaluate score for each of the 8 lines (rows, columns, diagonals)
         score += evaluateLine(0, 0, 0, 1, 0, 2);  // row 0
         score += evaluateLine(1, 0, 1, 1, 1, 2);  // row 1
         score += evaluateLine(2, 0, 2, 1, 2, 2);  // row 2
@@ -135,13 +117,14 @@ public class AIPlayerMinimax extends AIPlayer {
         score += evaluateLine(0, 2, 1, 2, 2, 2);  // col 2
         score += evaluateLine(0, 0, 1, 1, 2, 2);  // diagonal
         score += evaluateLine(0, 2, 1, 1, 2, 0);  // alternate diagonal
+
         return score;
     }
 
     /** The heuristic evaluation function for the given line of 3 cells
-     @Return +100, +10, +1 for 3-, 2-, 1-in-a-line for computer.
-     -100, -10, -1 for 3-, 2-, 1-in-a-line for opponent.
-     0 otherwise */
+     * Return +100, +10, +1 for 3-, 2-, 1-in-a-line for computer.
+     * -100, -10, -1 for 3-, 2-, 1-in-a-line for opponent.
+     * 0 otherwise */
     private int evaluateLine(int row1, int col1, int row2, int col2, int row3, int col3) {
         int score = 0;
 
@@ -190,6 +173,19 @@ public class AIPlayerMinimax extends AIPlayer {
             }
         }
         return score;
+    }
+
+    /** Returns true if the game is close to end and few moves are left */
+    private boolean isCloseToEndGame() {
+        int emptyCells = 0;
+        for (int row = 0; row < ROWS; ++row) {
+            for (int col = 0; col < COLS; ++col) {
+                if (cells[row][col].content == Seed.NO_SEED) {
+                    emptyCells++;
+                }
+            }
+        }
+        return emptyCells <= 3;  // If only 3 or fewer moves left, consider the game close to end
     }
 
     private int[] winningPatterns = {

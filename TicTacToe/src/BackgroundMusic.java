@@ -4,18 +4,18 @@ import java.net.URL;
 
 public class BackgroundMusic {
 
-    private Clip clip;
+    private static Clip clip;
 
     public BackgroundMusic(String resourcePath) {
         try {
             // Load the audio file using getResource
-            URL audioFileUrl = getClass().getClassLoader().getResource("audio/bgm2.wav");
+            URL bgm = getClass().getClassLoader().getResource("audio/bgm2.wav");
 
-            if (audioFileUrl == null) {
+            if (bgm == null) {
                 throw new IOException("Audio file not found: " + resourcePath);
             }
 
-            AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFileUrl);
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(bgm);
             clip = AudioSystem.getClip();
             clip.open(audioStream);
         } catch (Exception e) {
@@ -30,7 +30,7 @@ public class BackgroundMusic {
         }
     }
 
-    public void stop() {
+    public static void stop() {
         if (clip != null) {
             clip.stop();
         }

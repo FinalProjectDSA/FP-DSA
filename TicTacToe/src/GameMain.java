@@ -3,6 +3,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.net.URL;
 
+
 public class GameMain extends JPanel {
     private static final long serialVersionUID = 1L;
 
@@ -28,9 +29,19 @@ public class GameMain extends JPanel {
     private BackgroundMusic backgroundMusic;
 
     private boolean isDarkMode = false;
+<<<<<<< HEAD
+    private boolean gameOverPopupShown = false;  // Flag to track if popup has been shown
+
+    private boolean aiEnabled = false;  // Toggle AI mode
+    private String crossPlayerName = null;  // Store the name for Cross
+    private String noughtPlayerName = null;  // Store the name for Nought
+
+    private Random random = new Random();  // Random object for AI move
+=======
     private boolean aiEnabled = false; // Toggle AI mode
     private String crossPlayerName = null; // Store the name for Cross
     private String noughtPlayerName = null; // Store the name for Nought
+>>>>>>> 623ca4637c72cce0995a1a72217f80935a766b37
 
     public GameMain(boolean aienabled) {
         this.aiEnabled = aienabled;
@@ -38,8 +49,14 @@ public class GameMain extends JPanel {
         setLayout(new BorderLayout());
         setBackground(COLOR_BG_LIGHT);
         // Initialize background music
+<<<<<<< HEAD
+        backgroundMusic = new BackgroundMusic("audio/bgm2.wav");  // path to your audio file
+        // Preload sound effects to prevent delay
+        SoundEffect.preloadAll();
+=======
         backgroundMusic = new BackgroundMusic("audio/bgm2.wav"); // path to your audio file
 
+>>>>>>> 623ca4637c72cce0995a1a72217f80935a766b37
         // Game board panel
         JPanel gameBoardPanel = new JPanel() {
             @Override
@@ -69,8 +86,6 @@ public class GameMain extends JPanel {
 
                         if (currentState == State.PLAYING) SoundEffect.WUP.play();
                     }
-                } else {
-                    newGame();
                 }
                 repaint();
             }
@@ -220,14 +235,20 @@ public class GameMain extends JPanel {
         repaint();
     }
 
+    // Modify the `paintComponent` method
     @Override
     public void paintComponent(Graphics g) {
-        super.paintComponent(g);
+        super.paintComponent(g);  // Always call super for proper painting
         board.paint(g);
 
         if (currentState == State.PLAYING) {
             statusBar.setForeground(Color.BLACK);
             statusBar.setText(currentPlayer.getDisplayName() + "'s Turn");
+<<<<<<< HEAD
+        } else if (currentState != null && !gameOverPopupShown) {  // Check if the game is over
+            showGameOverPopup();  // Show the game over popup only if the game is actually over
+            gameOverPopupShown = true;  // Prevent the pop-up from showing again
+=======
         } else if (currentState == State.DRAW) {
             statusBar.setForeground(Color.RED);
             statusBar.setText("It's a Draw! Click to play again.");
@@ -243,11 +264,76 @@ public class GameMain extends JPanel {
             statusBar.setText("'" + Seed.NOUGHT.getDisplayName() + "' Won!");
             SoundEffect.WIN.play();
             backgroundMusic.stop();
+>>>>>>> 623ca4637c72cce0995a1a72217f80935a766b37
         }
     }
 
+    // Show game over popup
+    public void showGameOverPopup() {
+        if (currentState == State.DRAW) {
+            statusBar.setForeground(Color.RED);
+            statusBar.setText("It's a Draw! Click to play again.");
+        } else if (currentState == State.CROSS_WON) {
+            statusBar.setForeground(Color.RED);
+            statusBar.setText("'" + Seed.CROSS.getDisplayName() + "' Won! Click to play again.");
+        } else if (currentState == State.NOUGHT_WON) {
+            statusBar.setForeground(Color.RED);
+            statusBar.setText("'" + Seed.NOUGHT.getDisplayName() + "' Won! Click to play again.");
+        }
+
+        int choice = JOptionPane.showConfirmDialog(
+                this,
+                "Do you want to play again?",
+                "Game Over",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        // Handle the player's choice
+        if (choice == JOptionPane.YES_OPTION) {
+            newGame(); // Start a new game
+        } else {
+            System.exit(0); // Exit the application
+        }
+    }
+
+    // Called when the game ends (win/lose/tie)
+//    public void onGameEnd() {
+//        // Stop the background music immediately
+//        BackgroundMusic.stop();
+//
+//        // Play the appropriate sound effect based on the game state
+//        switch (gameState) {
+//            case CROSS_WON:
+//                SoundEffect.WIN.play();
+//                break;
+//            case DRAW:
+//                SoundEffect.TIE.play();
+//                break;
+//            case NOUGHT_WON:
+//                SoundEffect.WIN.play();
+//                break;
+//        }
+
+    // Show a pop-up dialog asking if the player wants to play again
+//        int choice = JOptionPane.showConfirmDialog(
+//                this,
+//                "Do you want to play again?",
+//                "Game Over",
+//                JOptionPane.YES_NO_OPTION
+//        );
+//
+//        // Handle the player's choice
+//        if (choice == JOptionPane.YES_OPTION) {
+//            newGame(); // Start a new game
+//        } else {
+//            System.exit(0); // Exit the application
+//        }
+//    }
+}
+
+
     // Home page constructor and methods
-    public static class HomePage extends JFrame {
+    public class HomePage extends JFrame {
 
         private JPanel buttonPanel;
         private JButton startButton;
@@ -350,6 +436,7 @@ public class GameMain extends JPanel {
                 public void actionPerformed(ActionEvent e) {
                     dispose();  // Close the home page
                     GameMain game = new GameMain(false);
+                    game.currentState = State.PLAYING;
                 }
             });
 
@@ -362,6 +449,7 @@ public class GameMain extends JPanel {
                 public void actionPerformed(ActionEvent e) {
                     dispose();  // Close the home page
                     GameMain game = new GameMain(true);
+                    game.currentState = State.PLAYING;
                 }
             });
 
@@ -376,7 +464,8 @@ public class GameMain extends JPanel {
         }
     }
 
-    public static void main(String[] args) {
+
+    public void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 HomePage homePage = new HomePage();
@@ -384,4 +473,4 @@ public class GameMain extends JPanel {
             }
         });
     }
-}
+

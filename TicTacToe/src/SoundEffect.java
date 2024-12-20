@@ -26,6 +26,7 @@ public enum SoundEffect {
     PLAYAGAIN("audio/playagain.wav"),
     WUP("audio/wup.wav");
 
+
     /** Nested enumeration for specifying volume */
     public static enum Volume {
         MUTE, LOW, MEDIUM, HIGH
@@ -66,8 +67,21 @@ public enum SoundEffect {
         }
     }
 
-    /** Optional static method to pre-load all the sound files. */
-    static void initGame() {
-        values(); // calls the constructor for all the elements
+    public void stop() {
+        if (clip != null) {
+            clip.stop();
+        }
     }
+
+    public static void preloadAll() {
+        for (SoundEffect sound : values()) {
+            sound.play();  // Just initialize the clip
+            sound.stop();  // Immediately stop after playing to make sure it's loaded
+        }
+    }
+
+    /** Optional static method to pre-load all the sound files. */
+//    static void initGame() {
+//        values(); // calls the constructor for all the elements
+//    }
 }

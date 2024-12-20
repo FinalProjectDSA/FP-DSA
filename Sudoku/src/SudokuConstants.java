@@ -8,7 +8,6 @@
  * 3 - 5026231081 - Oryza Reynaleta Wibowo
  */
 
-
 public class SudokuConstants {
     /** Size of the board */
     public static final int GRID_SIZE = 9;

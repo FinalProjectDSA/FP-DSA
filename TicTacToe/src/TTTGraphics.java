@@ -1,230 +1,275 @@
+/**
+ * ES234317-Algorithm and Data Structures
+ * Semester Ganjil, 2024/2025
+ * Group Capstone Project
+ * Group 7
+ * 1 - 5026231011 - William Bryan Pangestu
+ * 2 - 5026231022 - Tiffany Catherine Prasetya
+ * 3 - 5026231081 - Oryza Reynalete Wibowo
+ */
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+
 /**
- * Tic-Tac-Toe: Two-player Graphics version with Simple-OO in one class
+ * Connect-Four: Two-player Graphics version with Simple-OO in one class
  */
 public class TTTGraphics extends JFrame {
-    private static final long serialVersionUID = 1L; // to prevent serializable warning
+    private static final long serialVersionUID = 1L; // untuk mencegah peringatan serializable
 
-    // Define named constants for the game board
-    public static final int ROWS = 3;  // ROWS x COLS cells
-    public static final int COLS = 3;
+    // Definisikan konstanta untuk papan permainan
+    public static final int ROWS = 6;  // Ubah menjadi 6
+    public static final int COLS = 7;  // Ubah menjadi 7
 
-    // Define named constants for the drawing graphics
-    public static final int CELL_SIZE = 120; // cell width/height (square)
-    public static final int BOARD_WIDTH  = CELL_SIZE * COLS; // the drawing canvas
+    // Definisikan konstanta untuk menggambar grafik
+    public static final int CELL_SIZE = 120; // lebar/tinggi sel (persegi)
+    public static final int BOARD_WIDTH  = CELL_SIZE * COLS; // kanvas menggambar
     public static final int BOARD_HEIGHT = CELL_SIZE * ROWS;
-    public static final int GRID_WIDTH = 10;                  // Grid-line's width
+    public static final int GRID_WIDTH = 10;                  // lebar garis grid
     public static final int GRID_WIDTH_HALF = GRID_WIDTH / 2;
-    // Symbols (cross/nought) are displayed inside a cell, with padding from border
-    public static final int CELL_PADDING = CELL_SIZE / 5;
-    public static final int SYMBOL_SIZE = CELL_SIZE - CELL_PADDING * 2; // width/height
-    public static final int SYMBOL_STROKE_WIDTH = 8; // pen's stroke width
-    public static final Color COLOR_BG = Color.WHITE;  // background
+    public static final Color COLOR_BG = Color.WHITE;  // latar belakang
     public static final Color COLOR_BG_STATUS = new Color(216, 216, 216);
-    public static final Color COLOR_GRID   = Color.LIGHT_GRAY;  // grid lines
-    public static final Color COLOR_CROSS  = new Color(211, 45, 65);  // Red #D32D41
-    public static final Color COLOR_NOUGHT = new Color(76, 181, 245); // Blue #4CB5F5
+    public static final Color COLOR_GRID   = Color.LIGHT_GRAY;  // garis grid
+    public static final Color COLOR_CROSS  = new Color(211, 45, 65);  // Merah
+    public static final Color COLOR_NOUGHT = new Color(76, 181, 245); // Biru
     public static final Font FONT_STATUS = new Font("OCR A Extended", Font.PLAIN, 14);
 
-    // This enum (inner class) contains the various states of the game
+    // Enum untuk menyimpan status permainan
     public enum State {
         PLAYING, DRAW, CROSS_WON, NOUGHT_WON
     }
-    private State currentState;  // the current game state
+    private State currentState;  // status permainan saat ini
 
-    // This enum (inner class) is used for:
-    // 1. Player: CROSS, NOUGHT
-    // 2. Cell's content: CROSS, NOUGHT and NO_SEED
+    // Enum untuk menyimpan isi sel
     public enum Seed {
         CROSS, NOUGHT, NO_SEED
     }
-    private Seed currentPlayer; // the current player
-    private Seed[][] board;     // Game board of ROWS-by-COLS cells
+    private Seed currentPlayer; // pemain saat ini
+    private Seed[][] board;     // papan permainan berukuran ROWS x COLS
 
-    // UI Components
-    private GamePanel gamePanel; // Drawing canvas (JPanel) for the game board
+    // Komponen UI
+    private GamePanel gamePanel; // Kanvas menggambar (JPanel) untuk papan permainan
     private JLabel statusBar;  // Status Bar
 
-    /** Constructor to setup the game and the GUI components */
+    /** Konstruktor untuk mengatur permainan dan komponen GUI */
     public TTTGraphics() {
-        // Initialize the game objects
+        // Inisialisasi objek permainan
         initGame();
 
-        // Set up GUI components
-        gamePanel = new GamePanel();  // Construct a drawing canvas (a JPanel)
+        // Atur komponen GUI
+        gamePanel = new GamePanel();  // Buat kanvas menggambar (JPanel)
         gamePanel.setPreferredSize(new Dimension(BOARD_WIDTH, BOARD_HEIGHT));
 
-        // The canvas (JPanel) fires a MouseEvent upon mouse-click
+        // Kanvas (JPanel) memicu MouseEvent saat diklik
         gamePanel.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {  // mouse-clicked handler
+            public void mouseClicked(MouseEvent e) {  // penanganan klik mouse
                 int mouseX = e.getX();
-                int mouseY = e.getY();
-                // Get the row and column clicked
-                int row = mouseY / CELL_SIZE;
-                int col = mouseX / CELL_SIZE;
+                int colSelected = mouseX / CELL_SIZE; // Dapatkan kolom yang diklik
 
                 if (currentState == State.PLAYING) {
-                    if (row >= 0 && row < ROWS && col >= 0
-                            && col < COLS && board[row][col] == Seed.NO_SEED) {
-                        // Update board[][] and return the new game state after the move
-                        currentState = stepGame(currentPlayer, row, col);
-                        // Switch player
-                        currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
+                    if (colSelected >= 0 && colSelected < COLS) {
+                        // Cari sel kosong mulai dari baris paling bawah
+                        for (int row = ROWS - 1; row >= 0; row--) {
+                            if (board[row][colSelected] == Seed.NO_SEED) {
+                                board[row][colSelected] = currentPlayer; // Buat langkah
+                                currentState = stepGame(currentPlayer, row, colSelected); // Perbarui status
+                                // Ganti pemain
+                                currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
+                                break;
+                            }
+                        }
                     }
-                } else {       // game over
-                    newGame(); // restart the game
+                } else { // Jika permainan sudah selesai
+                    newGame(); // Mulai ulang permainan
                 }
-                // Refresh the drawing canvas
-                repaint();  // Callback paintComponent().
+                repaint(); // Refresh tampilan
             }
         });
 
-        // Setup the status bar (JLabel) to display status message
+        // Atur status bar (JLabel) untuk menampilkan pesan status
         statusBar = new JLabel("       ");
         statusBar.setFont(FONT_STATUS);
         statusBar.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 12));
-        statusBar.setOpaque(true);
+        statusBar.setOpaque (true);
         statusBar.setBackground(COLOR_BG_STATUS);
 
-        // Set up content pane
+        // Atur konten pane
         Container cp = getContentPane();
         cp.setLayout(new BorderLayout());
         cp.add(gamePanel, BorderLayout.CENTER);
-        cp.add(statusBar, BorderLayout.PAGE_END); // same as SOUTH
+        cp.add(statusBar, BorderLayout.PAGE_END); // sama dengan SOUTH
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        pack();  // pack all the components in this JFrame
-        setTitle("Tic Tac Toe");
-        setVisible(true);  // show this JFrame
+        pack();  // kemas semua komponen dalam JFrame ini
+        setTitle("Connect Four");
+        setVisible(true);  // tampilkan JFrame ini
 
         newGame();
     }
 
-    /** Initialize the Game (run once) */
+    /** Inisialisasi permainan (dijalankan sekali) */
     public void initGame() {
-        board = new Seed[ROWS][COLS]; // allocate array
+        board = new Seed[ROWS][COLS]; // alokasikan array
     }
 
-    /** Reset the game-board contents and the status, ready for new game */
+    /** Reset konten papan permainan dan status, siap untuk permainan baru */
     public void newGame() {
         for (int row = 0; row < ROWS; ++row) {
             for (int col = 0; col < COLS; ++col) {
-                board[row][col] = Seed.NO_SEED; // all cells empty
+                board[row][col] = Seed.NO_SEED; // semua sel kosong
             }
         }
-        currentPlayer = Seed.CROSS;    // cross plays first
-        currentState  = State.PLAYING; // ready to play
+        currentPlayer = Seed.CROSS;    // pemain CROSS bermain pertama
+        currentState  = State.PLAYING; // siap untuk bermain
     }
 
     /**
-     *  The given player makes a move on (selectedRow, selectedCol).
-     *  Update cells[selectedRow][selectedCol]. Compute and return the
-     *  new game state (PLAYING, DRAW, CROSS_WON, NOUGHT_WON).
+     * Pemain yang diberikan melakukan langkah pada (selectedRow, selectedCol).
+     * Perbarui cells[selectedRow][selectedCol]. Hitung dan kembalikan
+     * status permainan baru (PLAYING, DRAW, CROSS_WON, NOUGHT_WON).
      */
     public State stepGame(Seed player, int selectedRow, int selectedCol) {
-        // Update game board
+        // Perbarui papan permainan
         board[selectedRow][selectedCol] = player;
 
-        // Compute and return the new game state
-        if (board[selectedRow][0] == player  // 3-in-the-row
-                && board[selectedRow][1] == player
-                && board[selectedRow][2] == player
-                || board[0][selectedCol] == player // 3-in-the-column
-                && board[1][selectedCol] == player
-                && board[2][selectedCol] == player
-                || selectedRow == selectedCol  // 3-in-the-diagonal
-                && board[0][0] == player
-                && board[1][1] == player
-                && board[2][2] == player
-                || selectedRow + selectedCol == 2 // 3-in-the-opposite-diagonal
-                && board[0][2] == player
-                && board[1][1] == player
-                && board[2][0] == player) {
+        // Hitung dan kembalikan status permainan baru
+        if (hasWon(player, selectedRow, selectedCol)) {
             return (player == Seed.CROSS) ? State.CROSS_WON : State.NOUGHT_WON;
         } else {
-            // Nobody win. Check for DRAW (all cells occupied) or PLAYING.
+            // Tidak ada yang menang. Periksa DRAW (semua sel terisi) atau PLAYING.
             for (int row = 0; row < ROWS; ++row) {
                 for (int col = 0; col < COLS; ++col) {
                     if (board[row][col] == Seed.NO_SEED) {
-                        return State.PLAYING; // still have empty cells
+                        return State.PLAYING; // masih ada sel kosong
                     }
                 }
             }
-            return State.DRAW; // no empty cell, it's a draw
+            return State.DRAW; // tidak ada sel kosong, ini adalah hasil imbang
         }
     }
 
+    /** Memeriksa apakah pemain telah menang */
+    /** Memeriksa apakah pemain telah menang */
+    public boolean hasWon(Seed theSeed, int rowSelected, int colSelected) {
+        // Cek horizontal
+        if (checkDirection(theSeed, rowSelected, colSelected, 0, 1) || // Kanan
+                checkDirection(theSeed, rowSelected, colSelected, 0, -1)) { // Kiri
+            return true;
+        }
+
+        // Cek vertikal
+        if (checkDirection(theSeed, rowSelected, colSelected, 1, 0)) { // Bawah
+            return true;
+        }
+
+        // Cek diagonal (dari kiri atas ke kanan bawah)
+        if (checkDirection(theSeed, rowSelected, colSelected, 1, 1) || // Kanan Bawah
+                checkDirection(theSeed, rowSelected, colSelected, -1, -1)) { // Kiri Atas
+            return true;
+        }
+
+        // Cek diagonal (dari kanan atas ke kiri bawah)
+        if (checkDirection(theSeed, rowSelected, colSelected, 1, -1) || // Kiri Bawah
+                checkDirection(theSeed, rowSelected, colSelected, -1, 1)) { // Kanan Atas
+            return true;
+        }
+
+        return false; // Tidak ditemukan 4-in-a-line
+    }
+
+    /** Memeriksa arah tertentu untuk 4 dalam baris */
+    private boolean checkDirection(Seed theSeed, int row, int col, int rowIncrement, int colIncrement) {
+        int count = 1; // Mulai dengan 1 untuk sel yang baru saja dimainkan
+
+        // Cek satu arah
+        for (int i = 1; i < 4; i++) {
+            int r = row + i * rowIncrement;
+            int c = col + i * colIncrement;
+            if (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c] == theSeed) {
+                count++;
+            } else {
+                break; // Hentikan jika tidak ada lagi yang cocok
+            }
+        }
+
+        // Cek arah yang berlawanan
+        for (int i = 1; i < 4; i++) {
+            int r = row - i * rowIncrement;
+            int c = col - i * colIncrement;
+            if (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c] == theSeed) {
+                count++;
+            } else {
+                break; // Hentikan jika tidak ada lagi yang cocok
+            }
+        }
+
+        return count >= 4; // Kembalikan true jika ada 4 dalam baris
+    }
+
     /**
-     *  Inner class DrawCanvas (extends JPanel) used for custom graphics drawing.
+     * Kelas dalam GamePanel (extends JPanel) digunakan untuk menggambar grafik kustom.
      */
     class GamePanel extends JPanel {
-        private static final long serialVersionUID = 1L; // to prevent serializable warning
+        private static final long serialVersionUID = 1L; // untuk mencegah peringatan serializable
 
         @Override
-        public void paintComponent(Graphics g) {  // Callback via repaint()
+        public void paintComponent(Graphics g) {  // Callback melalui repaint()
             super.paintComponent(g);
-            setBackground(COLOR_BG);  // set its background color
+            setBackground(COLOR_BG);  // set latar belakang
 
-            // Draw the grid lines
+            // Gambar garis grid
             g.setColor(COLOR_GRID);
             for (int row = 1; row < ROWS; ++row) {
                 g.fillRoundRect(0, CELL_SIZE * row - GRID_WIDTH_HALF,
-                        BOARD_WIDTH-1, GRID_WIDTH, GRID_WIDTH, GRID_WIDTH);
+                        BOARD_WIDTH - 1, GRID_WIDTH, GRID_WIDTH, GRID_WIDTH); // Menambahkan arcWidth dan arcHeight
             }
             for (int col = 1; col < COLS; ++col) {
                 g.fillRoundRect(CELL_SIZE * col - GRID_WIDTH_HALF, 0,
-                        GRID_WIDTH, BOARD_HEIGHT-1, GRID_WIDTH, GRID_WIDTH);
+                        GRID_WIDTH, BOARD_HEIGHT - 1, GRID_WIDTH, GRID_WIDTH); // Menambahkan arcWidth dan arcHeight
             }
 
-            // Draw the Seeds of all the cells if they are not empty
-            // Use Graphics2D which allows us to set the pen's stroke
-            Graphics2D g2d = (Graphics2D)g;
-            g2d.setStroke(new BasicStroke(SYMBOL_STROKE_WIDTH,
-                    BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            // Gambar biji dari semua sel jika tidak kosong
+            Graphics2D g2d = (Graphics2D) g;
             for (int row = 0; row < ROWS; ++row) {
                 for (int col = 0; col < COLS; ++col) {
-                    int x1 = col * CELL_SIZE + CELL_PADDING;
-                    int y1 = row * CELL_SIZE + CELL_PADDING;
-                    if (board[row][col] == Seed.CROSS) {  // draw a 2-line cross
+                    int x1 = col * CELL_SIZE + CELL_SIZE / 5;
+                    int y1 = row * CELL_SIZE + CELL_SIZE / 5;
+                    if (board[row][col] == Seed.CROSS) {  // gambar lingkaran merah
                         g2d.setColor(COLOR_CROSS);
-                        int x2 = (col + 1) * CELL_SIZE - CELL_PADDING;
-                        int y2 = (row + 1) * CELL_SIZE - CELL_PADDING;
-                        g2d.drawLine(x1, y1, x2, y2);
-                        g2d.drawLine(x2, y1, x1, y2);
-                    } else if (board[row][col] == Seed.NOUGHT) {  // draw a circle
+                        g2d.fillOval(x1, y1, CELL_SIZE - CELL_SIZE / 5 * 2, CELL_SIZE - CELL_SIZE / 5 * 2);
+                    } else if (board[row][col] == Seed.NOUGHT) {  // gambar lingkaran biru
                         g2d.setColor(COLOR_NOUGHT);
-                        g2d.drawOval(x1, y1, SYMBOL_SIZE, SYMBOL_SIZE);
+                        g2d.fillOval(x1, y1, CELL_SIZE - CELL_SIZE / 5 * 2, CELL_SIZE - CELL_SIZE / 5 * 2);
                     }
                 }
             }
 
-            // Print status message
+            // Cetak pesan status
             if (currentState == State.PLAYING) {
                 statusBar.setForeground(Color.BLACK);
-                statusBar.setText((currentPlayer == Seed.CROSS) ? "X's Turn" : "O's Turn");
+                statusBar.setText((currentPlayer == Seed.CROSS) ? "Red's Turn" : "Blue's Turn");
             } else if (currentState == State.DRAW) {
                 statusBar.setForeground(Color.RED);
                 statusBar.setText("It's a Draw! Click to play again");
             } else if (currentState == State.CROSS_WON) {
                 statusBar.setForeground(Color.RED);
-                statusBar.setText("'X' Won! Click to play again");
+                statusBar.setText("Red Won! Click to play again");
             } else if (currentState == State.NOUGHT_WON) {
                 statusBar.setForeground(Color.RED);
-                statusBar.setText("'O' Won! Click to play again");
+                statusBar.setText("Blue Won! Click to play again");
             }
         }
     }
 
-    /** The entry main() method */
+    /** Metode utama untuk menjalankan aplikasi */
     public static void main(String[] args) {
-        // Run GUI codes in the Event-Dispatching thread for thread safety
+        // Jalankan kode GUI di thread Event-Dispatching untuk keamanan thread
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new TTTGraphics(); // Let the constructor do the job
+                new TTTGraphics(); // Biarkan konstruktor melakukan tugas
             }
         });
     }

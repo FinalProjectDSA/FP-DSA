@@ -7,8 +7,6 @@
  * 2 - 5026231022 - Tiffany Catherine Prasetya
  * 3 - 5026231081 - Oryza Reynaleta Wibowo
  */
-
-
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collections;

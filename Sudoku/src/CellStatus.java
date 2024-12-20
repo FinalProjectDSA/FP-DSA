@@ -7,7 +7,6 @@
  * 2 - 5026231022 - Tiffany Catherine Prasetya
  * 3 - 5026231081 - Oryza Reynaleta Wibowo
  */
-
 public enum CellStatus {
     GIVEN,         // clue, no need to guess
     TO_GUESS,      // need to guess - not attempted yet

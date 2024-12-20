@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.net.URL;
 
-
 public class GameMain extends JPanel {
     private static final long serialVersionUID = 1L;
 
@@ -37,7 +36,9 @@ public class GameMain extends JPanel {
 
     private Random random = new Random();  // Random object for AI move
 
-    public GameMain() {
+    public GameMain(boolean aienabled) {
+        this.aiEnabled = aienabled;
+
         setLayout(new BorderLayout());
         setBackground(COLOR_BG_LIGHT);
         // Initialize background music
@@ -163,15 +164,30 @@ public class GameMain extends JPanel {
     // Start a new game
     public void newGame() {
         backgroundMusic.play();
-        if (crossPlayerName == null || noughtPlayerName == null) {
-            crossPlayerName = JOptionPane.showInputDialog("Enter name for Player 1 (Cross, default 'X'): ");
-            noughtPlayerName = JOptionPane.showInputDialog("Enter name for Player 2 (Nought, default 'O'): ");
+//        debug aiEnabled
+//        System.out.println(aiEnabled);
+        if (!aiEnabled) {
+            // Ask for player names if AI is not enabled
+            if (crossPlayerName == null || noughtPlayerName == null) {
+                crossPlayerName = JOptionPane.showInputDialog("Enter name for Player 1 (Cross, default 'X'): ");
+                noughtPlayerName = JOptionPane.showInputDialog("Enter name for Player 2 (Nought, default 'O'): ");
 
-            if (crossPlayerName == null || crossPlayerName.isEmpty()) crossPlayerName = "Player 1 (X)";
-            if (noughtPlayerName == null || noughtPlayerName.isEmpty()) noughtPlayerName = "Player 2 (O)";
+                if (crossPlayerName == null || crossPlayerName.isEmpty()) crossPlayerName = "Player 1 (X)";
+                if (noughtPlayerName == null || noughtPlayerName.isEmpty()) noughtPlayerName = "Player 2 (O)";
 
-            Seed.CROSS.setDisplayName(crossPlayerName);
-            Seed.NOUGHT.setDisplayName(noughtPlayerName);
+                Seed.CROSS.setDisplayName(crossPlayerName);
+                Seed.NOUGHT.setDisplayName(noughtPlayerName);
+            }
+        } else {
+            // AI mode: only ask for Player 1's name
+            if (crossPlayerName == null) {
+                crossPlayerName = JOptionPane.showInputDialog("Enter name for Player 1 (Cross, default 'X'): ");
+                if (crossPlayerName == null || crossPlayerName.isEmpty()) crossPlayerName = "Player 1 (X)";
+                Seed.CROSS.setDisplayName(crossPlayerName);
+            }
+
+            // Set a default name for AI Player 2
+            Seed.NOUGHT.setDisplayName("Computer");
         }
 
         // Reset the game board
@@ -185,11 +201,6 @@ public class GameMain extends JPanel {
         currentPlayer = Seed.CROSS;  // Player 1 (Cross) starts the game
         currentState = State.PLAYING;
         statusBar.setText(currentPlayer.getDisplayName() + "'s Turn");
-
-        // If it's AI's turn (in AI mode), make the move
-        if (aiEnabled && currentPlayer == Seed.NOUGHT) {
-            makeAIMove();
-        }
     }
 
     // Method to handle AI's move
@@ -245,8 +256,6 @@ public class GameMain extends JPanel {
             backgroundMusic.stop();
         }
     }
-
-
 
     // Home page constructor and methods
     public static class HomePage extends JFrame {
@@ -351,8 +360,7 @@ public class GameMain extends JPanel {
             playerVsPlayerButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     dispose();  // Close the home page
-                    GameMain game = new GameMain();
-                    game.aiEnabled = false;  // Disable AI mode
+                    GameMain game = new GameMain(false);
                 }
             });
 
@@ -364,9 +372,7 @@ public class GameMain extends JPanel {
             playerVsAiButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     dispose();  // Close the home page
-                    GameMain game = new GameMain();
-                    game.aiEnabled = true;  // Enable AI mode
-                    game.newGame();  // Start the game for Player vs AI
+                    GameMain game = new GameMain(true);
                 }
             });
 
@@ -379,15 +385,14 @@ public class GameMain extends JPanel {
             buttonPanel.revalidate();
             buttonPanel.repaint();
         }
-
-        public static void main(String[] args) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    HomePage homePage = new HomePage();
-                    homePage.setVisible(true);
-                }
-            });
-        }
     }
 
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                HomePage homePage = new HomePage();
+                homePage.setVisible(true);
+            }
+        });
+    }
 }

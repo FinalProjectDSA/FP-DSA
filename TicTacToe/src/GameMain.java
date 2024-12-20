@@ -33,6 +33,7 @@ public class GameMain extends JPanel {
     private boolean aiEnabled = false; // Toggle AI mode
     private String crossPlayerName = null; // Store the name for Cross
     private String noughtPlayerName = null; // Store the name for Nought
+    private ImageIcon backgroundImage;
 
     public GameMain(boolean aienabled) {
         this.aiEnabled = aienabled;
@@ -48,6 +49,10 @@ public class GameMain extends JPanel {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 board.paint(g);
+                if (backgroundImage != null) {
+                    // Draw the GIF, scaling it to the size of the panel
+                    g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
+                }
             }
         };
 
@@ -380,13 +385,13 @@ public class GameMain extends JPanel {
         public HomePage() {
             // Set up the frame
             setTitle("Tic Tac Toe - Home");
-            setSize(500, 500);
+            setSize(400, 400);
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             setLocationRelativeTo(null);
             setLayout(new BorderLayout());
 
             // Add a background image
-            URL imgURL = getClass().getClassLoader().getResource("image/background.jpg");
+            URL imgURL = getClass().getClassLoader().getResource("image/homepage.gif");
             JLabel background = null;
             if (imgURL == null) {
                 System.err.println("Error: Couldn't find the background image file!");
@@ -397,18 +402,12 @@ public class GameMain extends JPanel {
                 add(background);
             }
 
-            // Title label
-            JLabel titleLabel = new JLabel("Welcome to OTW's World!");
-            titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            titleLabel.setFont(new Font("Poppins", Font.BOLD, 40));
-            titleLabel.setForeground(Color.WHITE);
-            background.add(titleLabel, BorderLayout.NORTH);
-
             // Button panel
             buttonPanel = new JPanel(new GridLayout(4, 1, 10, 10)); // Initially, we have only 3 buttons
             buttonPanel.setOpaque(false);
-            buttonPanel.setLayout(new GridLayout(4, 1, 20, 20));  // Adjusted for 3 buttons initially
-            buttonPanel.setBorder(BorderFactory.createEmptyBorder(50, 100, 50, 100));
+            buttonPanel.setLayout(new GridLayout(4, 1, 5, 5));  // Adjusted for 3 buttons initially
+            buttonPanel.setBorder(BorderFactory.createEmptyBorder(100, 100, 60, 100));
+            buttonPanel.setPreferredSize(new Dimension(200, 20));
 
             // Start Game button
             startButton = new JButton("TicTacToe");

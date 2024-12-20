@@ -24,6 +24,7 @@ public class GameMain extends JPanel {
     private JMenu menu;
     private JMenuItem themeItem;
     private JMenuItem exitItem;
+    private JMenuItem backToHomePage; // New menu item for AI toggle
     private JMenuItem aiToggleItem; // New menu item for AI toggle
     private BackgroundMusic backgroundMusic;
 
@@ -108,6 +109,22 @@ public class GameMain extends JPanel {
         exitItem = new JMenuItem("Exit");
         // Initialize the AI toggle menu item with dynamic text based on the current AI mode
         aiToggleItem = new JMenuItem(aiEnabled ? "Play vs Human" : "Play vs AI");
+        backToHomePage = new JMenuItem("Back to Home Page");
+
+        backToHomePage.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                BackgroundMusic.stop();
+                // Dispose of the parent frame before navigating
+                Window parentWindow = SwingUtilities.getWindowAncestor(statusBar);
+                if (parentWindow instanceof JFrame) {
+                    parentWindow.dispose(); // Close the current JFrame
+                }
+
+                // Open the game options page
+                HomePage home = new HomePage();
+                home.setVisible(true);
+            }
+        });
 
         // Toggle AI mode
         aiToggleItem.addActionListener(new ActionListener() {
@@ -130,6 +147,7 @@ public class GameMain extends JPanel {
 
         menu.add(themeItem);
         menu.add(aiToggleItem); // Add AI toggle to the menu
+        menu.add(backToHomePage);
         menu.add(exitItem);
         menuBar.add(menu);
 

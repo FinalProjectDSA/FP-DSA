@@ -405,27 +405,27 @@ public class GameMain extends JPanel {
             // Button panel
             buttonPanel = new JPanel(new GridLayout(4, 1, 10, 10)); // Initially, we have only 3 buttons
             buttonPanel.setOpaque(false);
-            buttonPanel.setLayout(new GridLayout(4, 1, 5, 5));  // Adjusted for 3 buttons initially
+            buttonPanel.setLayout(new GridLayout(4, 1, 5, 8));  // Adjusted for 3 buttons initially
             buttonPanel.setBorder(BorderFactory.createEmptyBorder(100, 100, 60, 100));
-            buttonPanel.setPreferredSize(new Dimension(200, 20));
+            buttonPanel.setPreferredSize(new Dimension(100, 40));
 
             // Start Game button
-            startButton = new JButton("TicTacToe");
-            startButton.setFont(new Font("Poppins", Font.BOLD, 18));
-            startButton.setBackground(new Color(255, 255, 255));
-            startButton.setForeground(Color.BLACK);
-            startButton.setFocusPainted(false);
+            startButton = new JButton();
+            startButton.setIcon(new ImageIcon(getClass().getResource("image/TTT.png"))); // Replace with your actual image file path
+            startButton.setBorderPainted(false); // Remove default button border
+            startButton.setContentAreaFilled(false); // Remove default button background
+            startButton.setFocusPainted(false); // Remove focus border
             startButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     showGameOptions();
                 }
             });
             // Instructions button
-            JButton instructionsButton = new JButton("Instructions");
-            instructionsButton.setFont(new Font("Poppins", Font.BOLD, 18));
-            instructionsButton.setBackground(new Color(255, 255, 255));
-            instructionsButton.setForeground(Color.BLACK);
-            instructionsButton.setFocusPainted(false);
+            JButton instructionsButton = new JButton();
+            instructionsButton.setIcon(new ImageIcon(getClass().getResource("image/INFO.png"))); // Replace with your actual image file path
+            instructionsButton.setBorderPainted(false); // Remove default button border
+            instructionsButton.setContentAreaFilled(false); // Remove default button background
+            instructionsButton.setFocusPainted(false); // Remove focus border
             instructionsButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     JOptionPane.showMessageDialog(null, "Tic Tac Toe Instructions:\n\n"
@@ -443,11 +443,11 @@ public class GameMain extends JPanel {
             });
 
             // Connect 4 button
-            connect4Button = new JButton("Connect 4");
-            connect4Button.setFont(new Font("Poppins", Font.BOLD, 18));
-            connect4Button.setBackground(new Color(255, 255, 255));
-            connect4Button.setForeground(Color.BLACK);
-            connect4Button.setFocusPainted(false);
+            connect4Button = new JButton();
+            connect4Button.setIcon(new ImageIcon(getClass().getResource("image/C4.png"))); // Replace with your actual image file path
+            connect4Button.setBorderPainted(false); // Remove default button border
+            connect4Button.setContentAreaFilled(false); // Remove default button background
+            connect4Button.setFocusPainted(false); // Remove focus border
             connect4Button.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     dispose();  // Close the home page
@@ -456,14 +456,14 @@ public class GameMain extends JPanel {
             });
 
             // Exit button
-            exitButton = new JButton("Exit");
-            exitButton.setFont(new Font("Poppins", Font.BOLD, 18));
-            exitButton.setBackground(new Color(255, 255, 255));
-            exitButton.setForeground(Color.BLACK);
-            exitButton.setFocusPainted(false);
+            exitButton = new JButton();
+            exitButton.setIcon(new ImageIcon(getClass().getResource("image/EXIT.png"))); // Replace with your actual image file path
+            exitButton.setBorderPainted(false); // Remove default button border
+            exitButton.setContentAreaFilled(false); // Remove default button background
+            exitButton.setFocusPainted(false); // Remove focus border
             exitButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    System.exit(0);
+                    System.exit(0); // Exit the application
                 }
             });
 
@@ -481,11 +481,11 @@ public class GameMain extends JPanel {
             buttonPanel.removeAll();
 
             // Create the new game mode buttons
-            playerVsPlayerButton = new JButton("Player vs Player");
-            playerVsPlayerButton.setFont(new Font("Poppins", Font.BOLD, 18));
-            playerVsPlayerButton.setBackground(new Color(255, 255, 255));
-            playerVsPlayerButton.setForeground(Color.BLACK);
-            playerVsPlayerButton.setFocusPainted(false);
+            playerVsPlayerButton = new JButton();
+            playerVsPlayerButton.setIcon(new ImageIcon(getClass().getResource("image/PVP.png"))); // Replace with your actual image file path
+            playerVsPlayerButton.setBorderPainted(false); // Remove default button border
+            playerVsPlayerButton.setContentAreaFilled(false); // Remove default button background
+            playerVsPlayerButton.setFocusPainted(false); // Remove focus border
             playerVsPlayerButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     dispose();  // Close the home page
@@ -493,11 +493,11 @@ public class GameMain extends JPanel {
                 }
             });
 
-            playerVsAiButton = new JButton("Player vs AI");
-            playerVsAiButton.setFont(new Font("Poppins", Font.BOLD, 18));
-            playerVsAiButton.setBackground(new Color(255, 255, 255));
-            playerVsAiButton.setForeground(Color.BLACK);
-            playerVsAiButton.setFocusPainted(false);
+            playerVsAiButton = new JButton();
+            playerVsAiButton.setIcon(new ImageIcon(getClass().getResource("image/PVAI.png"))); // Replace with your actual image file path
+            playerVsAiButton.setBorderPainted(false); // Remove default button border
+            playerVsAiButton.setContentAreaFilled(false); // Remove default button background
+            playerVsAiButton.setFocusPainted(false); // Remove focus border
             playerVsAiButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     dispose();  // Close the home page
@@ -506,6 +506,9 @@ public class GameMain extends JPanel {
             });
 
             // Add the new buttons to the panel
+            buttonPanel.setLayout(new GridLayout(3, 1, 10, 10));  // Adjusted for 3 buttons initially
+            buttonPanel.setBorder(BorderFactory.createEmptyBorder(120, 100, 60, 100));
+            buttonPanel.setPreferredSize(new Dimension(100, 40));
             buttonPanel.add(playerVsPlayerButton);  // Add Player vs Player button
             buttonPanel.add(playerVsAiButton);  // Add Player vs AI button
             buttonPanel.add(exitButton);  // Re-add Exit button

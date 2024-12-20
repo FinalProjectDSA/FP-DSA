@@ -154,6 +154,13 @@ public class GameMain extends JPanel {
 
         initGame();
         newGame();
+        javax.swing.Timer timer = new javax.swing.Timer(50, new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                repaint();
+            }
+        });
+        timer.start();
     }
 
     // Initialize the game

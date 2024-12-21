@@ -30,7 +30,6 @@ public class GameMain extends JPanel {
     private JButton restartButton;
     private JMenuBar menuBar;
     private JMenu menu;
-    private JMenuItem themeItem;
     private JMenuItem exitItem;
     private JMenuItem backToHomePage; // New menu item for AI toggle
     private JMenuItem aiToggleItem; // New menu item for AI toggle
@@ -156,7 +155,6 @@ public class GameMain extends JPanel {
             }
         });
 
-        menu.add(themeItem);
         menu.add(aiToggleItem); // Add AI toggle to the menu
         menu.add(backToHomePage);
         menu.add(exitItem);

@@ -35,6 +35,9 @@ public class GameMain extends JPanel {
     private String crossPlayerName = null; // Store the name for Cross
     private String noughtPlayerName = null; // Store the name for Nought
     private ImageIcon backgroundImage;
+    // Add flags for background sound and sound effect
+    private boolean isBackgroundSoundMuted = false;
+    private boolean isSoundEffectMuted = false;
     public GameMain(boolean aienabled) {
         this.aiEnabled = aienabled;
         setLayout(new BorderLayout());
@@ -272,7 +275,7 @@ public class GameMain extends JPanel {
         if (currentState == State.DRAW) {
             statusBar.setForeground(Color.RED);
             SoundEffect.TIE.play();
-            statusBar.setText("It's a Draw! Click to play again.");
+            statusBar.setText("It's a Draw!");
         } else if (currentState == State.CROSS_WON) {
             statusBar.setForeground(Color.RED);
             SoundEffect.WIN.play();
@@ -427,7 +430,7 @@ public class GameMain extends JPanel {
             background.add(buttonPanel, BorderLayout.CENTER);
         }
         // Method to show game options after clicking Start Game
-        private void showGameOptions() {
+        public void showGameOptions() {
             // Clear the current button panel
             buttonPanel.removeAll();
 

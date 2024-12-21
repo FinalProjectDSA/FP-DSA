@@ -17,11 +17,7 @@ public class GameMain extends JPanel {
     private static final long serialVersionUID = 1L;
     public static final String TITLE = "Tic Tac Toe";
     public static final Color COLOR_BG_LIGHT = Color.WHITE;
-    public static final Color COLOR_BG_DARK = new Color(30, 30, 30);
     public static final Color COLOR_BG_STATUS_LIGHT = new Color(216, 216, 216);
-    public static final Color COLOR_BG_STATUS_DARK = new Color(50, 50, 50);
-    public static final Color COLOR_CROSS = new Color(239, 105, 80);
-    public static final Color COLOR_NOUGHT = new Color(64, 154, 225);
     public static final Font FONT_STATUS = new Font("OCR A Extended", Font.PLAIN, 14);
     private Board board;
     private State currentState;
@@ -30,7 +26,6 @@ public class GameMain extends JPanel {
     private JButton restartButton;
     private JMenuBar menuBar;
     private JMenu menu;
-    private JMenuItem themeItem;
     private JMenuItem exitItem;
     private JMenuItem backToHomePage; // New menu item for AI toggle
     private JMenuItem aiToggleItem; // New menu item for AI toggle
@@ -106,7 +101,6 @@ public class GameMain extends JPanel {
         // Menu bar and items
         menuBar = new JMenuBar();
         menu = new JMenu("Menu");
-        themeItem = new JMenuItem("Switch to Dark Mode");
         exitItem = new JMenuItem("Exit");
         // Initialize the AI toggle menu item with dynamic text based on the current AI mode
         aiToggleItem = new JMenuItem(aiEnabled ? "Play vs Human" : "Play vs AI");
@@ -141,7 +135,6 @@ public class GameMain extends JPanel {
                 System.exit(0);
             }
         });
-        menu.add(themeItem);
         menu.add(aiToggleItem); // Add AI toggle to the menu
         menu.add(backToHomePage);
         menu.add(exitItem);

@@ -103,10 +103,10 @@ public class SudokuMain extends JFrame {
 
 
     private void showHomePage() {
-        JDialog homeDialog = new JDialog(this, "Welcome to Sudoku", true);
+        JDialog homeDialog = new JDialog(this, "Sudoku - Homepage", true);
 
         // Load the background image as a resource
-        ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/homepagebg.jpg"));
+        ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/homepagess.png"));
         Image backgroundImage = backgroundIcon.getImage();
 
         // Create a custom panel to display the background image
@@ -119,12 +119,6 @@ public class SudokuMain extends JFrame {
         };
         backgroundPanel.setLayout(new BorderLayout());
 
-        JLabel welcomeLabel = new JLabel(
-                "<html><h1 style='color:white;'>Welcome to Sudoku!</h1><p style='color:white;'>How to play:</p>" +
-                        "<p style='color:white;'>Fill in a 9x9 grid so that each column, row, and 3x3 subgrid " +
-                        "contains all digits from 1 to 9.</p></html>", SwingConstants.CENTER);
-        welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        welcomeLabel.setVerticalAlignment(SwingConstants.CENTER);
 
         JTextField nameField = new JTextField();
         JButton startGameButton = new JButton("Start Game");
@@ -146,7 +140,6 @@ public class SudokuMain extends JFrame {
             }
         });
 
-        backgroundPanel.add(welcomeLabel, BorderLayout.CENTER);
         backgroundPanel.add(inputPanel, BorderLayout.SOUTH);
 
         homeDialog.setContentPane(backgroundPanel);

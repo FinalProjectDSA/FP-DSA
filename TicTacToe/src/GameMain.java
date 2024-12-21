@@ -8,9 +8,7 @@ public class GameMain extends JPanel {
 
     public static final String TITLE = "Tic Tac Toe";
     public static final Color COLOR_BG_LIGHT = Color.WHITE;
-    public static final Color COLOR_BG_DARK = new Color(30, 30, 30);
     public static final Color COLOR_BG_STATUS_LIGHT = new Color(216, 216, 216);
-    public static final Color COLOR_BG_STATUS_DARK = new Color(50, 50, 50);
     public static final Color COLOR_CROSS = new Color(239, 105, 80);
     public static final Color COLOR_NOUGHT = new Color(64, 154, 225);
     public static final Font FONT_STATUS = new Font("OCR A Extended", Font.PLAIN, 14);
@@ -28,7 +26,6 @@ public class GameMain extends JPanel {
     private JMenuItem aiToggleItem; // New menu item for AI toggle
     private BackgroundMusic backgroundMusic;
 
-    private boolean isDarkMode = false;
     private boolean gameOverPopupShown = false;
     private boolean aiEnabled = false; // Toggle AI mode
     private String crossPlayerName = null; // Store the name for Cross
@@ -110,7 +107,6 @@ public class GameMain extends JPanel {
         // Menu bar and items
         menuBar = new JMenuBar();
         menu = new JMenu("Menu");
-        themeItem = new JMenuItem("Switch to Dark Mode");
         exitItem = new JMenuItem("Exit");
         // Initialize the AI toggle menu item with dynamic text based on the current AI mode
         aiToggleItem = new JMenuItem(aiEnabled ? "Play vs Human" : "Play vs AI");
@@ -312,17 +308,23 @@ public class GameMain extends JPanel {
     public void showGameOverPopup() {
         BackgroundMusic.stop();
         gameOverPopupShown = true;  // Prevent the pop-up from showing again
-
         // Update the status bar message based on the game result
         if (currentState == State.DRAW) {
+            SoundEffect.TIE.play();
             statusBar.setForeground(Color.RED);
             statusBar.setText("It's a Draw! Click to play again.");
         } else if (currentState == State.CROSS_WON) {
+            SoundEffect.WIN.play();
             statusBar.setForeground(Color.RED);
-            statusBar.setText("'" + Seed.CROSS.getDisplayName() + "' Won! Click to play again.");
-        } else if (currentState == State.NOUGHT_WON) {
+            statusBar.setText("'" + Seed.CROSS.getDisplayName() + "' Won! Super cool!");
+        } else if(aiEnabled && currentState == State.NOUGHT_WON){
+            SoundEffect.LOSE.play();
             statusBar.setForeground(Color.RED);
-            statusBar.setText("'" + Seed.NOUGHT.getDisplayName() + "' Won! Click to play again.");
+            statusBar.setText("'" + Seed.NOUGHT.getDisplayName() + "Oh no, you lose!");
+        } else if(!aiEnabled && currentState == State.NOUGHT_WON){
+            SoundEffect.WIN.play();
+            statusBar.setForeground(Color.RED);
+            statusBar.setText("'" + Seed.NOUGHT.getDisplayName() + "' Won! Super cool!");
         }
 
         // Create a JButton for "Play Again" or game restart

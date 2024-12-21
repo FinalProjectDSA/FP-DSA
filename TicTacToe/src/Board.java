@@ -42,13 +42,6 @@ public class Board {
      *  new game state (PLAYING, DRAW, CROSS_WON, NOUGHT_WON).
      */
     public State stepGame(Seed player, int selectedRow, int selectedCol) {
-        if (selectedRow < 0 || selectedRow >= ROWS || selectedCol < 0 || selectedCol >= COLS) {
-            throw new ArrayIndexOutOfBoundsException("Invalid move: row=" + selectedRow + ", col=" + selectedCol);
-        }
-        if (cells[selectedRow][selectedCol].content != Seed.NO_SEED) {
-            throw new IllegalStateException("Cell already occupied at: row=" + selectedRow + ", col=" + selectedCol);
-        }
-
         // Update game board
         cells[selectedRow][selectedCol].content = player;
 

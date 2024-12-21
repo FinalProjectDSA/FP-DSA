@@ -29,6 +29,7 @@ public class TTTGraphics extends JFrame {
     public static final Color COLOR_CROSS = new Color(255, 0, 0); // Red for Player 1
     public static final Color COLOR_NOUGHT = new Color(255, 255, 0); // Yellow for Player 2
     public static final Font FONT_STATUS = new Font("OCR A Extended", Font.BOLD, 16);
+    private boolean gameOverPopupShown;
 
     public enum State {
         PLAYING, DRAW, CROSS_WON, NOUGHT_WON
@@ -76,6 +77,7 @@ public class TTTGraphics extends JFrame {
                                 board[row][colSelected] = currentPlayer;
                                 currentState = stepGame(currentPlayer, row, colSelected);
                                 currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
+                                SoundEffect.WUP.play();
                                 resetTimer();
                                 break;
                             }
@@ -159,6 +161,79 @@ public class TTTGraphics extends JFrame {
         resetTimer();
         repaint();
     }
+    public void showGameOverPopup() {
+        // Stop any background music if playing
+        BackgroundMusic.stop();
+
+        // Set the flag to prevent showing the popup multiple times
+        gameOverPopupShown = true;
+
+        // Update the status bar message based on the game result
+        String message = "";
+        String title = "Game Over";
+        Color messageColor = Color.RED;
+        SoundEffect soundEffect = null;
+
+        if (currentState == State.DRAW) {
+            message = "It's a Draw! Click to play again.";
+            soundEffect = SoundEffect.TIE;
+        } else if (currentState == State.CROSS_WON) {
+            message = "Red Won! Click Restart to play again.";
+            soundEffect = SoundEffect.WIN;
+        } else if (currentState == State.NOUGHT_WON) {
+            message = "Yellow Won! Click Restart to play again.";
+            soundEffect = SoundEffect.WIN;
+        }
+
+        if (soundEffect != null) {
+            soundEffect.play();
+        }
+
+        // Set the message in the status bar
+        statusBar.setText(message);
+        statusBar.setForeground(messageColor);
+
+        // Create a JButton for "Play Again" or game restart
+        JButton playAgainButton = new JButton("Play Again");
+        playAgainButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Dispose of the parent frame before navigating
+                Window parentWindow = SwingUtilities.getWindowAncestor(statusBar);
+                if (parentWindow instanceof JFrame) {
+                    parentWindow.dispose(); // Close the current JFrame
+                }
+                // Open the game options page
+                GameMain.HomePage home = new GameMain.HomePage();
+                home.setVisible(true);
+            }
+        });
+        // Create a JButton for exiting the game
+        JButton exitButton = new JButton("Exit");
+        exitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Dispose of the parent frame before exiting
+                Window parentWindow = SwingUtilities.getWindowAncestor(statusBar);
+                if (parentWindow instanceof JFrame) {
+                    parentWindow.dispose(); // Close the current JFrame
+                }
+                System.exit(0); // Exit the application
+            }
+        });
+        // Display options in a dialog
+        Object[] options = {playAgainButton, exitButton};
+        JOptionPane.showOptionDialog(
+                this,
+                "Do you want to play again?",
+                "Game Over",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
+    }
 
     public State stepGame(Seed player, int selectedRow, int selectedCol) {
         board[selectedRow][selectedCol] = player;
@@ -166,17 +241,22 @@ public class TTTGraphics extends JFrame {
         if (hasWon(player, selectedRow, selectedCol)) {
             if (player == Seed.CROSS) redScore++;
             else yellowScore++;
-            return (player == Seed.CROSS) ? State.CROSS_WON : State.NOUGHT_WON;
+            currentState = (player == Seed.CROSS) ? State.CROSS_WON : State.NOUGHT_WON;
+            showGameOverPopup();  // Show the game over popup
         } else {
             for (int row = 0; row < ROWS; ++row) {
                 for (int col = 0; col < COLS; ++col) {
                     if (board[row][col] == Seed.NO_SEED) {
-                        return State.PLAYING;
+                        currentState = State.PLAYING;
+                        return currentState;
                     }
                 }
             }
-            return State.DRAW;
+            currentState = State.DRAW;
+            showGameOverPopup();  // Show the game over popup if it's a draw
         }
+
+        return currentState;
     }
 
     public boolean hasWon(Seed theSeed, int rowSelected, int colSelected) {

@@ -30,7 +30,6 @@ public class GameMain extends JPanel {
     private JMenuItem backToHomePage; // New menu item for AI toggle
     private JMenuItem aiToggleItem; // New menu item for AI toggle
     private BackgroundMusic backgroundMusic;
-    private boolean isDarkMode = false;
     private boolean gameOverPopupShown = false;
     private boolean aiEnabled = false; // Toggle AI mode
     private String crossPlayerName = null; // Store the name for Cross

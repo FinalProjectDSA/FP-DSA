@@ -15,14 +15,14 @@ import java.net.URL;
 
 public class GameMain extends JPanel {
     private static final long serialVersionUID = 1L;
-
     public static final String TITLE = "Tic Tac Toe";
     public static final Color COLOR_BG_LIGHT = Color.WHITE;
+    public static final Color COLOR_BG_DARK = new Color(30, 30, 30);
     public static final Color COLOR_BG_STATUS_LIGHT = new Color(216, 216, 216);
+    public static final Color COLOR_BG_STATUS_DARK = new Color(50, 50, 50);
     public static final Color COLOR_CROSS = new Color(239, 105, 80);
     public static final Color COLOR_NOUGHT = new Color(64, 154, 225);
     public static final Font FONT_STATUS = new Font("OCR A Extended", Font.PLAIN, 14);
-
     private Board board;
     private State currentState;
     private Seed currentPlayer;
@@ -35,21 +35,18 @@ public class GameMain extends JPanel {
     private JMenuItem backToHomePage; // New menu item for AI toggle
     private JMenuItem aiToggleItem; // New menu item for AI toggle
     private BackgroundMusic backgroundMusic;
-
+    private boolean isDarkMode = false;
     private boolean gameOverPopupShown = false;
     private boolean aiEnabled = false; // Toggle AI mode
     private String crossPlayerName = null; // Store the name for Cross
     private String noughtPlayerName = null; // Store the name for Nought
     private ImageIcon backgroundImage;
-
     public GameMain(boolean aienabled) {
         this.aiEnabled = aienabled;
-
         setLayout(new BorderLayout());
         setBackground(COLOR_BG_LIGHT);
         // Initialize background music
         backgroundMusic = new BackgroundMusic("audio/bgm2.wav"); // path to your audio file
-
         // Game board panel
         JPanel gameBoardPanel = new JPanel() {
             @Override
@@ -62,32 +59,27 @@ public class GameMain extends JPanel {
                 }
             }
         };
-
         gameBoardPanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT));
         gameBoardPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int row = e.getY() / Cell.SIZE;
                 int col = e.getX() / Cell.SIZE;
-
                 if (currentState == State.PLAYING) {
                     if (row >= 0 && row < Board.ROWS && col >= 0 && col < Board.COLS
                             && board.cells[row][col].content == Seed.NO_SEED) {
                         currentState = board.stepGame(currentPlayer, row, col);
                         currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
-
                         // If playing against AI, AI will play after human's turn
                         if (aiEnabled && currentState == State.PLAYING) {
                             makeAIMove();
                         }
-
                         if (currentState == State.PLAYING) SoundEffect.WUP.play();
                     }
                 }
                 repaint();
             }
         });
-
         // Status bar and button panel
         statusBar = new JLabel();
         statusBar.setFont(FONT_STATUS);
@@ -95,7 +87,6 @@ public class GameMain extends JPanel {
         statusBar.setBackground(COLOR_BG_STATUS_LIGHT);
         statusBar.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         statusBar.setHorizontalAlignment(JLabel.LEFT);
-
         // Restart button
         restartButton = new JButton("Restart Game");
         restartButton.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -108,20 +99,18 @@ public class GameMain extends JPanel {
                 repaint();
             }
         });
-
         // Create a panel to hold the status bar and restart button
         JPanel statusPanel = new JPanel(new BorderLayout());
         statusPanel.add(statusBar, BorderLayout.CENTER);
         statusPanel.add(restartButton, BorderLayout.EAST);
-
         // Menu bar and items
         menuBar = new JMenuBar();
         menu = new JMenu("Menu");
+        themeItem = new JMenuItem("Switch to Dark Mode");
         exitItem = new JMenuItem("Exit");
         // Initialize the AI toggle menu item with dynamic text based on the current AI mode
         aiToggleItem = new JMenuItem(aiEnabled ? "Play vs Human" : "Play vs AI");
         backToHomePage = new JMenuItem("Back to Home Page");
-
         backToHomePage.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 BackgroundMusic.stop();
@@ -130,13 +119,11 @@ public class GameMain extends JPanel {
                 if (parentWindow instanceof JFrame) {
                     parentWindow.dispose(); // Close the current JFrame
                 }
-
                 // Open the game options page
                 HomePage home = new HomePage();
                 home.setVisible(true);
             }
         });
-
         // Toggle AI mode
         aiToggleItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -149,23 +136,19 @@ public class GameMain extends JPanel {
                 newGame(); // Reset the game after toggling AI mode
             }
         });
-
         exitItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
             }
         });
-
         menu.add(themeItem);
         menu.add(aiToggleItem); // Add AI toggle to the menu
         menu.add(backToHomePage);
         menu.add(exitItem);
         menuBar.add(menu);
-
         // Add components
         add(gameBoardPanel, BorderLayout.CENTER);
         add(statusPanel, BorderLayout.PAGE_END);
-
         // Set the menu bar
         JFrame frame = new JFrame(TITLE);
         frame.setJMenuBar(menuBar);
@@ -174,7 +157,6 @@ public class GameMain extends JPanel {
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
-
         initGame();
         newGame();
         javax.swing.Timer timer = new javax.swing.Timer(50, new java.awt.event.ActionListener() {
@@ -185,41 +167,32 @@ public class GameMain extends JPanel {
         });
         timer.start();
     }
-
     // Initialize the game
     public void initGame() {
         board = new Board();
     }
-
     // Start a new game
     public void newGame() {
         backgroundMusic.play();
-
         if (!aiEnabled) {
             // Ask for player names if AI is not enabled
             if (crossPlayerName == null || noughtPlayerName == null) {
                 crossPlayerName = JOptionPane.showInputDialog("Enter name for Player 1 (Cross, default 'X'): ");
                 noughtPlayerName = JOptionPane.showInputDialog("Enter name for Player 2 (Nought, default 'O'): ");
-
                 if (crossPlayerName == null || crossPlayerName.isEmpty()) crossPlayerName = "Player 1 (X)";
                 if (noughtPlayerName == null || noughtPlayerName.isEmpty()) noughtPlayerName = "Player 2 (O)";
-
                 Seed.CROSS.setDisplayName(crossPlayerName);
                 Seed.NOUGHT.setDisplayName(noughtPlayerName);
             }
-
             // Add character selection popup
             String crossCharacter = chooseCharacter(crossPlayerName + ", select your character:");
             String noughtCharacter = chooseCharacter(noughtPlayerName + ", select your character (different from Player 1):");
-
             while (crossCharacter.equals(noughtCharacter)) {
                 JOptionPane.showMessageDialog(null, "Both players cannot select the same character. Please choose again.");
                 noughtCharacter = chooseCharacter(noughtPlayerName + ", select your character (different from Player 1):");
             }
-
             Seed.CROSS.setImageFileName(crossCharacter);
             Seed.NOUGHT.setImageFileName(noughtCharacter);
-
         } else {
             // AI mode: Only ask for Player 1's name
             if (crossPlayerName == null) {
@@ -227,43 +200,34 @@ public class GameMain extends JPanel {
                 if (crossPlayerName == null || crossPlayerName.isEmpty()) crossPlayerName = "Player 1 (X)";
                 Seed.CROSS.setDisplayName(crossPlayerName);
             }
-
             // Add character selection for Player 1
             String crossCharacter = chooseCharacter(crossPlayerName + ", select your character:");
             Seed.CROSS.setImageFileName(crossCharacter);
-
             // Default AI character
             String aiCharacter = chooseCharacter("AI, select its character (different from Player 1):");
-
             while (crossCharacter.equals(aiCharacter)) {
                 JOptionPane.showMessageDialog(null, "AI cannot select the same character as Player 1. Please choose again.");
                 aiCharacter = chooseCharacter("AI, select its character (different from Player 1):");
             }
-
             Seed.NOUGHT.setDisplayName("Computer");
             Seed.NOUGHT.setImageFileName(aiCharacter);
         }
-
         // Reset the game board
         for (int row = 0; row < Board.ROWS; ++row) {
             for (int col = 0; col < Board.COLS; ++col) {
                 board.cells[row][col].content = Seed.NO_SEED;
             }
         }
-
         // Set the initial player and game state
         currentPlayer = Seed.CROSS; // Player 1 (Cross) starts the game
         currentState = State.PLAYING;
         statusBar.setText(currentPlayer.getDisplayName() + "'s Turn");
     }
-
     private String chooseCharacter(String message) {
         // Character options (names)
         String[] options = {"Oryza", "William", "Tiffany"};
-
         // Corresponding image file paths for each character
         String[] imagePaths = {"image/ory.gif", "image/webe.gif", "image/tiffy.gif"};
-
         // Show the dialog with character names
         int choice = JOptionPane.showOptionDialog(
                 null,
@@ -275,27 +239,22 @@ public class GameMain extends JPanel {
                 options,
                 options[0]
         );
-
         // Ensure a valid selection is made
         if (choice < 0) {
             JOptionPane.showMessageDialog(null, "You must select a character to proceed.");
             return chooseCharacter(message); // Prompt again if no selection is made
         }
-
         // Return the corresponding image file path based on the selected character
         return imagePaths[choice];
     }
-
     // Method to handle AI's move
     private void makeAIMove() {
         if (currentState != State.PLAYING) return;
-
         // Use Minimax for AI move
         AIPlayerMinimax aiPlayer = new AIPlayerMinimax(board); // AI plays as NOUGHT (O)
         int[] aiMove = aiPlayer.move();
         int row = aiMove[0];
         int col = aiMove[1];
-
         currentState = board.stepGame(currentPlayer, row, col);
         currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
         if (currentState == State.PLAYING) {
@@ -303,7 +262,6 @@ public class GameMain extends JPanel {
         }
         repaint();
     }
-
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);  // Always call super for proper painting
@@ -320,23 +278,22 @@ public class GameMain extends JPanel {
         gameOverPopupShown = true;  // Prevent the pop-up from showing again
         // Update the status bar message based on the game result
         if (currentState == State.DRAW) {
-            SoundEffect.TIE.play();
             statusBar.setForeground(Color.RED);
+            SoundEffect.TIE.play();
             statusBar.setText("It's a Draw! Click to play again.");
         } else if (currentState == State.CROSS_WON) {
-            SoundEffect.WIN.play();
             statusBar.setForeground(Color.RED);
+            SoundEffect.WIN.play();
             statusBar.setText("'" + Seed.CROSS.getDisplayName() + "' Won! Super cool!");
-        } else if(aiEnabled && currentState == State.NOUGHT_WON){
-            SoundEffect.LOSE.play();
+        } else if (currentState == State.NOUGHT_WON && !aiEnabled) {
             statusBar.setForeground(Color.RED);
-            statusBar.setText("'" + Seed.NOUGHT.getDisplayName() + "Oh no, you lose!");
-        } else if(!aiEnabled && currentState == State.NOUGHT_WON){
             SoundEffect.WIN.play();
-            statusBar.setForeground(Color.RED);
             statusBar.setText("'" + Seed.NOUGHT.getDisplayName() + "' Won! Super cool!");
+        } else if (currentState == State.NOUGHT_WON && aiEnabled) {
+            statusBar.setForeground(Color.RED);
+            SoundEffect.LOSE.play();
+            statusBar.setText("'" + Seed.NOUGHT.getDisplayName() + "' Lose! Try Again.");
         }
-
         // Create a JButton for "Play Again" or game restart
         JButton playAgainButton = new JButton("Play Again");
         playAgainButton.addActionListener(new ActionListener() {
@@ -347,14 +304,12 @@ public class GameMain extends JPanel {
                 if (parentWindow instanceof JFrame) {
                     parentWindow.dispose(); // Close the current JFrame
                 }
-
                 // Open the game options page
                 HomePage home = new HomePage();
                 home.setVisible(true);
                 home.showGameOptions();
             }
         });
-
         // Create a JButton for exiting the game
         JButton exitButton = new JButton("Exit");
         exitButton.addActionListener(new ActionListener() {
@@ -368,7 +323,6 @@ public class GameMain extends JPanel {
                 System.exit(0); // Exit the application
             }
         });
-
         // Display options in a dialog
         Object[] options = {playAgainButton, exitButton};
         JOptionPane.showOptionDialog(
@@ -382,18 +336,14 @@ public class GameMain extends JPanel {
                 options[0]
         );
     }
-
-
     // Home page constructor and methods
     public static class HomePage extends JFrame {
-
         private JPanel buttonPanel;
         private JButton startButton;
         private JButton playerVsPlayerButton;
         private JButton playerVsAiButton;
         private JButton connect4Button; // Button for Connect 4
         private JButton exitButton;
-
         public HomePage() {
             // Set up the frame
             setTitle("Tic Tac Toe - Home");
@@ -401,7 +351,6 @@ public class GameMain extends JPanel {
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             setLocationRelativeTo(null);
             setLayout(new BorderLayout());
-
             // Add a background image
             URL imgURL = getClass().getClassLoader().getResource("image/homepage.gif");
             JLabel background = null;
@@ -413,7 +362,6 @@ public class GameMain extends JPanel {
                 background.setLayout(new BorderLayout());
                 add(background);
             }
-
             // Button panel
             buttonPanel = new JPanel(new GridLayout(4, 1, 10, 10)); // Initially, we have only 3 buttons
             buttonPanel.setOpaque(false);
@@ -475,6 +423,7 @@ public class GameMain extends JPanel {
             exitButton.setFocusPainted(false); // Remove focus border
             exitButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
+                    System.exit(0);
                     System.exit(0); // Exit the application
                 }
             });
@@ -483,10 +432,8 @@ public class GameMain extends JPanel {
             buttonPanel.add(connect4Button); // Add Connect 4 button
             buttonPanel.add(instructionsButton);
             buttonPanel.add(exitButton);
-
             background.add(buttonPanel, BorderLayout.CENTER);
         }
-
         // Method to show game options after clicking Start Game
         private void showGameOptions() {
             // Clear the current button panel
@@ -524,13 +471,11 @@ public class GameMain extends JPanel {
             buttonPanel.add(playerVsPlayerButton);  // Add Player vs Player button
             buttonPanel.add(playerVsAiButton);  // Add Player vs AI button
             buttonPanel.add(exitButton);  // Re-add Exit button
-
             // Refresh the panel to show the new buttons
             buttonPanel.revalidate();
             buttonPanel.repaint();
         }
     }
-
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {

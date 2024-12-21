@@ -17,9 +17,7 @@ public class GameMain extends JPanel {
     private static final long serialVersionUID = 1L;
     public static final String TITLE = "Tic Tac Toe";
     public static final Color COLOR_BG_LIGHT = Color.WHITE;
-    public static final Color COLOR_BG_DARK = new Color(30, 30, 30);
     public static final Color COLOR_BG_STATUS_LIGHT = new Color(216, 216, 216);
-    public static final Color COLOR_BG_STATUS_DARK = new Color(50, 50, 50);
     public static final Color COLOR_CROSS = new Color(239, 105, 80);
     public static final Color COLOR_NOUGHT = new Color(64, 154, 225);
     public static final Font FONT_STATUS = new Font("OCR A Extended", Font.PLAIN, 14);
@@ -30,12 +28,10 @@ public class GameMain extends JPanel {
     private JButton restartButton;
     private JMenuBar menuBar;
     private JMenu menu;
-    private JMenuItem themeItem;
     private JMenuItem exitItem;
     private JMenuItem backToHomePage; // New menu item for AI toggle
     private JMenuItem aiToggleItem; // New menu item for AI toggle
     private BackgroundMusic backgroundMusic;
-    private boolean isDarkMode = false;
     private boolean gameOverPopupShown = false;
     private boolean aiEnabled = false; // Toggle AI mode
     private String crossPlayerName = null; // Store the name for Cross
@@ -141,7 +137,6 @@ public class GameMain extends JPanel {
                 System.exit(0);
             }
         });
-        menu.add(themeItem);
         menu.add(aiToggleItem); // Add AI toggle to the menu
         menu.add(backToHomePage);
         menu.add(exitItem);
